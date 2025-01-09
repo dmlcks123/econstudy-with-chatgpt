@@ -33,6 +33,6 @@
 | ch5 | ChatGPT 소개 및 활용 | ChatGPT 개요, OpenAI API 사용법 | API 활용 연습 |
 | ch7 | 자연어 처리 기초 | 텍스트 전처리, 토큰화, 임베딩, IMF Economic Outlook 데이터 | 연습 문제 4 |
 | ch8 | ChatGPT를 이용한 데이터 분석 | 자연어로 데이터 질문하기, 결과 해석 | 실습 과제 1 |
-| ch10 | 머신러닝 기초 | 회귀 분석, 분류 기법, Kaggle Stock Market Data | 연습 문제 5 |
-|  | ChatGPT와 머신러닝 결합 | 머신러닝 모델 해석 및 ChatGPT 활용 | 실습 과제 2 |
+| ch9 | 경제지표 분석 | 연습 문제 5 |
+| ch10 | ChatGPT와 머신러닝 결합 | 머신러닝 모델 해석 및 ChatGPT 활용 | 실습 과제 2 |
 
