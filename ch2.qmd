@@ -1104,3 +1104,4 @@ df2 = pd.DataFrame({
 result = df1.join(df2, how='inner')
 print(result)
 ```
+
