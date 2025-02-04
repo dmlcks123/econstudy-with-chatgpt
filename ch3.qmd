@@ -1,0 +1,753 @@
+---
+title: "Ch4. 탐색적 데이터 분석(EDA)"
+date: "2024-08-11"
+version: "1.0"
+author: "Byeongkwon Kim"
+format:
+  docx:
+    toc: false
+    number-sections: true
+    highlight-style: pygments
+    reference-doc: index.docx
+  html:
+    toc: false
+    number-sections: true
+    highlight-style: pygments
+---
+
+# 학습목표 {.unnumbered}
+- 파이썬을 이용한 탐색적 데이터 분석 과정 습득
+- ChatGPT와의 대화로 파이썬 코드를 획득하는 과정을 통한 데이터 분석
+- ChatGPT 사용 시 더 나은 답변을 얻기 위한 방법 습득
+<br>
+
+# 세부 학습 내용  {.unnumbered}
+ 1. 데이터 수집 및 불러오기
+ 2. 데이터 구조 확인
+ 3. 데이터 전처리
+ 4. 기술 통게 확인
+ 5. 데이터 시각화
+<br>
+
+# 데이터 수집 및 불러오기
+<br>
+
+::: {.callout-tip}
+ChatGPT에 바로 질문을 하는 경우 가상의 파일과 데이터를 스스로 생성후 답변한다. 질문을 시작하기 전에 분석하려는 데이터에 대한 설명을 간략히 알려 주면 더 나은 답변을 얻을 수 있다. 예를 들어 불러오려는 파일 명, 파일에 포함된 변수 명 등을 알려주면 맞춤형 정보에 가까운 답변을 얻을 수 있다.
+:::
+<br>
+
+::: {.callout-note title="ChatGPT에 질문하기"}
+1. gdp.csv파일을 불러오려고 해 파이썬 코드를 제시해줘
+2. unemployment.csv파일을 첫 3행은 제외하고 불러오려고 해 파이썬 코드를 제시해줘
+3. domestic.xlsx파일의 KOR 시트를 첫 5행은 제외하고 불러오려고 해 파이썬 코드를 제시해줘
+4. auto.dta파일 불러오려고 해 파이썬 코드를 제시해줘
+:::
+<br>
+
+- 보통 우리에게 익숙한 엑셀 혹은 STATA, SPSS와 같은 변수명과 관측치로 이루어 진 스프레드시트형 데이터는 파이썬에서 Pands라는 패키지를 이용하고, Dataframe이라고 부른다.
+<br>
+
+## CSV 파일 불러오기
+- 파이썬에서 파일을 불러올 때 불러올 파일의 경로를 별도의 변수에 지정하고 변수를 사용하거나, 직접 경로를 입력하는 두 가지 방법이 있다.
+- 한글이 포함된 경우 encoding에러가 발생할 수 있는데,  이 경우 `encoding` 옵션을 사용해 해결 가능하다.
+<br>
+
+- 아래는 직접 경로를 입력하는 방식을 사용하는 방법이다.
+<br>
+
+```{python}
+## Pandas 패키지 불러오기
+import pandas as pd
+
+# gpd.csv파일을 불러와 df라는 변수에 저장
+df = pd.read_csv('gdp.csv')
+```
+<br>
+
+- 불러올 파일 경로를 별도의 변수에 입력 후 사용하는 방법으로 결과는 위와 동일하다.
+```{python}
+## 경로를 변수에 입력
+csv_file_path = 'gdp.csv'
+df = pd.read_csv(csv_file_path)
+```
+<br>
+
+- 수집한 데이터 중 간혹 첫 몇 행에 주석이 담긴 경우가 있다. 이 경우는 아래의 옵션을 활용하면 해당 부분을 제외하고 데이터만 불러올 수 있다.
+```{python}
+#| eval: false
+df_csv = pd.read_csv('파일명 혹은 경로', delimiter=';', skiprows=3)
+```
+<br>
+
+::: {.callout-tip}
+한글이 포함된 데이터를 불러오면 encoding 오류가 발생하는 경우가 종종 있다. 이 경우 encoding 설정으로 해결이 가능한데 encoding 종류를 cp949, utf-8, utf-8-sig, euckr과 같이 많이 사용되는 인코딩 중 하나로 설정해보는 것이다. 그리고 판다스에서 파일을 저장 할 때도 의도적으로 인코딩을 utf-8-sig로 지정하는 것을 추천한다.
+:::
+<br>
+
+## Excel 불러오기
+- CSV와 달리 엑셀은 여러 시트로 구성되어 있는 경우가 있다. 이 경우 시트 명을 지정해 불러올 수 있다.
+```{python}
+#| eval: false
+df_excel = pd.read_excel('엑셀파일명.xlsx', sheet_name='시트 이름', skiprows=5)
+```
+<br>
+
+## 기타 형식
+- Stata, SPSS와 같은 통계패키지로 저장된 데이터나 Fixed-format으로 저장된 데이터도 불러올 수 있다.
+- ChatGPT에 특정 파일을 어떻게 불러오면 되는지 질문 하면 해당 코드를 제시해 준다.
+ - 파이썬에서 auto.dta 파일을 불러오는 코드를 제시해줘
+<br>
+
+# 데이터 확인하기
+- 데이터를 불러온 다음 가장 먼저 해야 할 일은 데이터가 잘 불러져 왔는지 확인하는 것이다. 데이터를 잘못 불러온 상태에서 분석을 아무리 해 봐야 소용이 없고, 자칫 잘못된 정보를 얻게 되는 상황을 방지하기 위함이다.
+<br>
+
+::: {.callout-note title="ChatGPT에 질문하기"}
+데이터프레임에 불러온 데이터 특성과 요약통계량을 확인하는 코드를 제시해줘
+::: 
+<br>
+
+- 데이터를 확인하는 대표적인 방법은 불러온 데이터의 일부를 출력해 보는 방법이 있다.
+- 다음이 코드를 통해 데이터를 불러오자.
+```{python}
+import pandas as pd
+
+df = pd.read_csv('gdp.csv')
+```
+<br>
+
+- 데이터를 불러온 다음 몇개 행을 출력해 데이터가 의도한대로 불러졍 왔는지 확인해보자. `df.head()`는 데이터프레임 변수 `df`에 저장된 데이터의 첫 5개 행을 출력해달라는 명령어이다. 괄호 안에 특정 숫자를 넣으면 해당 숫자만큼의 행을 출력한다. 음수를 넣으면 해당 숫자만큼을 제외하고 출력한다.
+```{python}
+df.head()
+```
+<br>
+
+::: {.callout-note}
+`print(df.head())`와 `df.head()`의 차이: `print(df.head())`는 출력 방식이 `print` 함수의 규칙을 따르고, `df.head()`는 `pandas`의 출력 규칙을 따른다. 경우에 따라 프린트 함수를 사용하는 것이 나은 경우가 있고, 그렇지 않은 경우가 있다.
+:::
+<br>
+
+- 데이터가 잘 불러져 왔다면 데이터의 구조를 파악할 필요가 있다. 다음의 명령어를 통해 변수 명은 무엇이고, 변수의 데이터 타입은 어떻게 지정되어 있고, 결측치는 몇 개인지를 확인해 데이터의 대략적인 정보를 파악할 수 있다. 아래 명령어는 데이터프레임의 요약 정보를 보여준다.
+- 해당 데이터 프레임에는 4개 열이 포함되어 있고, GDP와 Corruption열은 각각 10개의 결측이 있다. Country는 문자열로 보이고, 나머지 세 열은 숫자열인데 Year는 정수형, 나머지 2개 열은 소수점 이하가 포함된 숫자임을 알 수 있다.
+```{python}
+df.info()
+```
+<br>
+
+- 다음은 데이터프레임의 기술통계를 한눈에 보여주는 명령어이다.
+- 각 열의 갯수, 평균, 표준편차와 중위값을 비롯한 분위수 최저, 최고 값을 보여준다.
+```{python}
+df.describe()
+```
+<br>
+
+- 한 가지 특징은 Country열은 누락되었는데, 해당 열이 숫자형 데이터가 아닌 문자형 데이터이므로 평균이나 표준편차 값을 계산할 수 없기 때문이다. 해당 열을 포함시키려면 아래의 명령어를 사용하면 모든 데이터 타입과 상관 없이 모든 열이 포함된다.
+- 여기서 유용한 정보가 하나 나타나는데, unique 항목으로 몇 개의 고유한 값이 포함되었는지를 나타낸다. 여기서는 10개 국가가 포함된 데이터임을 알 수 있다. top 행에 Wakanda라는 값이 포함되어 있는데 알파벳 순서가 아닌 데이터 첫 행에 포함된 값을 의미한다.
+```{python}
+df.describe(include='all')
+```
+<br>
+
+::: {.callout-note}
+여기에 사용된 데이터도 ChatGPT를 통해 만들어낸 가상 데이터이다. 국가명은 영화에 포함된 도시명으로 설정하고, GDP와 Corruption간의 관계를 설정하고 결측치 갯수와 데이터 저장형태를 지정하고 데이터를 생성해 달라고 요청해 만들었다.
+:::
+<br>
+
+# 결측치 처리
+- 데이터를 불러오면 보통 결측이 포함되어 있다. 일부 변수만 결측인 경우도 있고 전체가 결측인 경우도 있다. 결측치는 데이터가 입력되지 않은 경우도 있고, 0일 수 없는 값에 0이 입력되어 있거나 혹은 99999와 같은 의도된 어떤 숫자로 입력된 경우도 있다. 
+- 여기서는 여러 경우에 따라 어떻게 결측을 처리할 것인지 학습한다.
+<br>
+
+::: {.callout-note title="ChatGPT에 질문하기"}
+데이터프레임에 결측치가 포함되어 있어, 다양한 시나리오에 따라 결측치를 처리하는 방법을 설명해줘
+::: 
+<br>
+
+## 결측치 확인
+- 우선 불러온 데이터에 결측의 경우 데이터가 입력되지 않은 경우에 몇 개의 결측이 있는지 확인해보자. 앞서 `df.info()` 혹은 `df.describe()`로 몇 개의 결측이 있는지 확인했었다. 여기서는 결측치를 확인하기 위한 명령어를 통해 확인해보자.
+- 아래 명령어는 모든 열과 행의 결측치 정보를 True와 False로 반환해준다.
+
+```{python}
+#| echo: false
+#| include: false
+df_temp = df.head()
+```
+```{python}
+#| eval: false
+#| echo: true
+print(df.isnull()) 
+```
+```{python}
+#| echo: false
+print(df_temp.isnull()) 
+```
+<br>
+
+- 문제는 위 정보는 크게 도움이 되지 않는다는 점이다. 좀 더 단순하게 각 열의 결측치 갯수를 반환하는 명령어를 소개한다.
+
+```{python}
+print(df.isnull().sum())  # 각 열의 결측치 개수 반환
+```
+<br>
+
+## 결측치를 삭제하는 다양한 경우
+- 결측치가 어느 변수에 몇 개 있는지 확인했다면, 결측치를 처리해야 한다. 여기서는 결측치를 삭제하는 방법을 설명한다.
+<br>
+
+### 결측치가 1개라도 포함된 관측치를 삭제하는 경우
+- 가장 단순한 방법은 1개라도 결측치가 포함된 관측치는 삭제하는 것이다. 이 경우가 항상 최선은 아니겠으나 가장 단순하고 직관적인 방법이므로 우선 설명한다.
+<br>
+
+- 결측치 1개라도 있는 경우를 모두 제외한 데이터가 포함된 변수를 생성한다. `df.dropna()`는 1개라도 결측이 있는 경우는 모두 버려달라는 메서드이다.
+```{python}
+df_cleaned = df.dropna()
+```
+<br>
+
+::: {.callout-note}
+파이썬에서 메서드란 객체(여기서는 변수에 해당)의 기능을 의미한다. 일종의 객체에 적용 가능한 도구로, 여기서는 `df`라는 변수(객체)에 `dropna()`라는 기능을 적용해 달라는 의미이다.
+:::
+<br>
+
+::: {.callout-note}
+파이썬에서는 우리에게 익순한 시트 형태의 데이터가 변수에 저장된다. 이는 하나의 데이터만 불러와 사용할 필요가 없다는 이야기이기도 하다. 따라서 변수를 계속 생성해 수정된 데이터를 저장해 나가는 행위가 가능하고, 문제가 있다면 바로 직전의 데이터가 포함된 변수를 불러와 작업을 이어 나가는 행위가 가능하다. Stata 혹은 SPSS를 사용했던 경험이 있는 경우 낯설긴 하지만 유용한 측면이 분명히 있다.
+:::
+<br>
+
+- 아래와 같이 명령어를 실행하면 단순히 출력하는 것에 그치는데 이런 경우는 말 그대로 출력에 그치고 기존 데이터는 변하지 않는다. STATA나 SPSS처럼 명령어를 실행하면 불가역적인 상태가 되는 것과는 다르다는 것을 기억하자.
+
+```{python}
+#| eval: false
+df.dropna()
+```
+<br>
+
+- 결측치를 제거한 후에도 잘 제거되었는지 확인하는 습관을 들이자.
+
+```{python}
+print(df_cleaned.describe())
+print("------------------------------")
+print(df.describe())
+```
+<br>
+
+- 기존 변수에 덮어쓰는 방법도 있다. 옵션으로 `inplace=True`로 설정하면 기존 변수에 결과를 덮어씌운다. 이 옵션은 `dropna()` 뿐만 아니라 다른 메서드의 옵션으로도 많이 사용된다. 데이터프레임의 요약 정보를 출력해보면, 덮어쓰기 전 데이터와 달라졌음을 알 수 있다.
+```{python}
+df.dropna(inplace=True)
+print(df.describe())
+```
+<br>
+
+### 특정 변수가 결측인 경우 삭제
+- 연구자가 질문에 답하는 과정에서 꼭 필요한 변수가 있고 그렇지 않은 경우가 있다. 반드시 포함되어야 하는 변수의 결측만 제거하려면 아래 명령어를 사용하면 된다. 결측을 제거한 다음에는 데이터를 확인하는 습관을 갖자.
+
+```{python}
+#| eval: false
+df_cleaned = df.dropna(subset=['열 이름'])
+df_cleaned.describe()
+```
+<br>
+
+- 한번에 한개 이상의 열에 결측을 제거하려면 아래와 같이 열을 list 형태로 입력하면 된다.
+```{python}
+#| eval: false
+df_cleaned = df.dropna(subset=['Column 1', 'Column 1'])
+df_cleaned.describe()
+```
+<br>
+
+- 경우에 따라 결측이 '99999'와 같이 특정 숫자로 기록된 경우가 있다. 이런 경우는 `dropna`를 적용하기 이전에 해당 값을 결측으로 변경하는 단계를 거쳐야 한다. 그리고 이 경우에는 `numpy`라는 패키지를 추가로 불러와야 한다. 여기서도 기존 데이터에 덮어씌우는 방법과 변수를 새로 생성하는 방법을 모두 적용할 수 있다.
+<br>
+
+- 데이터를 불러와 첫 5개 행을 보면, 99999로 기록된 경우를 확인 가능하다.
+```{python}
+import numpy as np
+
+df_99999 = pd.read_csv('gdp_99999.csv')
+df_99999.head(3)
+```
+<br>
+
+- 99999라는 값을 결측으로 변경하고, gdp와 corruption열이 결측인 경우를 삭제하자.
+
+```{python}
+df_99999.replace(99999, np.nan, inplace=True) # 기존 데이터에 덮어쓰기
+df_99999_cleaned = df.dropna(subset=['gdp']) # gdp가 결측인 경우 삭제, 새로운 변수 생성
+df_99999_cleaned.dropna(subset=['corruption'], inplace=True) # corruption이 결측인 경우 삭제, 기존 변수에 덮어쓰기
+df_99999_cleaned.head(3) # 첫 3개 행 확인
+```
+<br>
+
+### 시나리오 - ID를 기준으로 A 변수에 값이 1개라도 결측인 경우 제거
+- 특정 시나리오에 대해서도 ChatGPT를 통해 코드를 얻을 수 있는데, 여기서는 아래와 같이 ChatGPT에게 특정 시나리오 질문을 통해 코드를 얻었다. 여기서는 gdp 변수가 1번이라도 결측인 국가는 삭제하는 코드를 제시한다.
+  - (ChatGPT 질문): 데이터프레임에서 ID 기준으로 A 변수가 1개라도 결측이면 삭제하는 방법을 설명해줘
+<br>
+
+```{python}
+df = pd.read_csv('gdp.csv')
+print(df.describe(include='all'))
+
+missing_a = df[df['gdp'].isnull()]['country'].unique()
+df_cleaned = df[~df['country'].isin(missing_a)]
+```
+<br>
+
+- 의도된대로 결측이 제거되었는지 확인하자.
+
+```{python}
+print(df.describe(include='all'))
+print("------------------------------")
+print(df_cleaned.describe(include='all'))
+```
+<br>
+
+# 기술 통계 확인
+- 결측치를 제거하고 데이터 전처리가 끝났다면, 데이터의 특징들을 살펴볼 단계가 되었다. 앞서 `info()`와 `describe()` 메서드로 데이터의 대략적인 형태와 통계량을 볼 수 있었다. 여기서는 몇 가지 간단한 옵션을 설명하고 넘어간다.
+<br>
+
+::: {.callout-note title="ChatGPT에 질문하기"}
+데이터프레임에서 기술통계를 확인하는 다양한 방법을 설명해줘
+::: 
+<br>
+
+- 데이터프레임에 `describe()`를 적용하면, 각 변수의 평균, 표준편차를 포함한 다양한 통계량을 바로 확인 가능했다. 다만 해당 메서드를 바로 적용하면 모든 변수의 정보를 보여주므로 과한 측면이 있다. 일반적인 패널데이터를 상기해보면 수 많은 질문의 결과가 포함되어 있고, 보통 연구자는 모든 변수에 관심이 있지는 않다.
+<br>
+
+- 아래 명령어는 일부 변수 혹은 조건에 해당하는 경우의 요약통게량만 확인하는 명령어들이다.
+<br>
+
+- 우선 연구자가 관심을 갖는 일부 변수만 보려면 아래와 같다. 아래는 요약통계량을 별도의 변수에 저장하고 해당 변수를 출력하는 형태이다.
+
+```{python}
+basic_stats = df_cleaned[['gdp', 'corruption']].describe()
+print(basic_stats)
+```
+<br>
+
+- 특정 변수가 일정 조건에 해당하는 경우로 corruption 이 30 이상인 경우만 나타낸다.
+```{python}
+df_cleaned[df_cleaned['corruption'] > 30].describe(include='all')
+```
+<br>
+
+- 국가명이 Wakanda인 경우만 보려면 아래와 같다.
+```{python}
+df[df['country'] == 'Wakanda'].describe(include='all')
+```
+<br>
+
+# 데이터 시각화
+- 더 다양한 형태로 변수들을 조합하고, 시각화 과정을 통해 데이터를 탐색해보자
+- 파이썬에는 여러 데이터 시각화 도구가 있는데, 대표적으로 matplotlib seaborn이 있다. matplotlib 높은 수준의 커스터마이징과 유연한 기능을 제공하지만, 그만큼 사용자가 익히고 설정해야 하는 부분이 많다. 반면 seaborn은 matplotlib 위에 구축된 라이브러리로 상대적으로 사용하기 쉽다는 장점이 있다. 여기서는 seaborn을 이용해 다양한 시각화 방법을 소개한다.
+<br>
+
+::: {.callout-note title="ChatGPT에 질문하기"}
+데이터프레임으로 불러온 데이터를 Seaborn으로 시각화하는 다양한 방법을 설명해줘
+::: 
+<br>
+
+- Seaborn은 앞서 설명한대로 matplotlib 위에 구축되어 있어 두 패키지 모두를 불러와야 한다. 필요한 패키지와 데이터를 불러오자.
+
+```{python}
+# 패키지 불러오기
+## seaborn은 matplotlib 위에 구축되어 seaborn과 matblolip 둘 다 import
+import seaborn as sns
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+
+df = pd.read_csv('gdp.csv')
+```
+<br>
+
+## 라인 그래프
+- 시간에 따라 변하는 값을 나타내는 대표적인 그래프인 라인 그래프를 그려보자
+```{python}
+# Seaborn을 사용하여 라인 그래프 그리기
+sns.lineplot(data=df, x='year', y='gdp', hue='country')
+
+# 그래프 제목 및 축 레이블 설정
+plt.title('GDP by Year for Each Country')
+plt.xlabel('Year')
+plt.ylabel('GDP')
+
+# 그래프 표시
+plt.show()
+```
+<br>
+
+- 위 코드는 ChatGPT에 그래프를 그리는 코드를 제시해달라는 질문으로 얻은 코드이다. 이 때 앞서 언급한 내용을 바탕으로 질문 예시는 다음과 같다.
+  - (ChatGPT 질문): Seaborn을 이용해 데이터프레임 df에 포함된 x 축 year, y축 gdp, 그룹 변수 country로 line 그래프를 그리는 파이썬 코드를 제시해줘
+  - Seaborn이라고 명시하지 않는 경우 일반적으로 matplotlib을 이용한 코드를 제시해준다.
+<br>
+
+- 여기에 몇 가지 옵션을 추가해 보자
+- 우선 그래프가 너무 많으니 일부 국가의 그래프만 그리고 다음의 옵션을 적용해보자.
+  1. 국가별로 다른 선과 마커 적용
+  2. 범례 위치를 오른쪽 하단으로 옮기고, 범례 제목과 범례 글자 크기 9로 변경
+
+```{python}
+import seaborn as sns
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mtick
+
+# 특정 국가만 필터링
+df_filtered = df[df['country'].isin(['Naboo', 'Gotham', 'Wakanda'])]
+
+# 스타일과 마커를 각 국가별로 다르게 설정
+sns.lineplot(data=df_filtered, x='year', y='gdp', hue='country', style='country', 
+             markers=['o', 's', 'D'])
+
+# 그래프 제목 및 축 레이블 설정
+plt.title('GDP by Year for Naboo, Gotham, and Wakanda')
+plt.xlabel('Year')
+plt.ylabel('GDP')
+
+
+# 범례를 1행으로 설정
+plt.legend(title='Country', loc='lower right', ncol=1, fontsize=9, title_fontsize=9)
+
+# Y축 값에 천 단위 콤마 추가
+plt.gca().yaxis.set_major_formatter(mtick.FuncFormatter(lambda x, p: format(int(x), ',')))
+
+# 그래프 표시
+plt.show()
+```
+<br>
+
+::: {.callout-tip}
+ChatGPT를 통해 얻은 코드를 수정하고 실행하면 오류가 발생하는 경우가 빈번하다, 바로 코드가 틀린 부분을 식별하면 좋지만 그렇지 못한 경우가 더 많다. 이런 상황이라면 실행한 코드를 ChatGPT에 붙여넣고 코드를 점검해달라고 요청하면 해당 코드 리뷰를 통해 설명해주고, 오류를 잡아준다.
+:::
+<br>
+
+::: {.callout-note}
+수치에는 보통 천 단위마다 콤마를 찍는다. 이러한 기능도 ChatGPT에 의뢰해 적용할 수 있다. 예를 들면 Y축에 천자리 마다 콤마를 찍는 코드를 제시해 달라고 하면 아래와 같은 코드를 제시해준다.
+
+`plt.gca().yaxis.set_major_formatter(mtick.FuncFormatter(lambda x, p: format(int(x), ',')))`
+
+코드 작동법을 정확히 알 수는 없지만 적용하면 어쨋든 우리가 원하는 기능을 한다.
+:::
+<br>
+
+::: {.callout-tip}
+생성형 AI가 없던 과거에는 파이썬이나 R에서 그래프에 한글을 사용하기 위한 과정이 상당히 어려웠다. 수 많은 웹사이트에서 제시하는 코드를 적용하기를 반복해야 하는 경우가 많았다. 지금은 ChatGPT나 다른 생성형 AI에게 그래프를 그리는 코드를 요청할 때 한글 폰트를 적용해야 한다로 알려만 주면 코드를 바로 제시해 준다. 아래가 그 예시이다. 
+
+- 패키지 불러오기
+import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
+
+- 작업 폴더 내 NanumGothic.ttf 폰트를 등록하고 설정
+font_path = 'NanumGothic.ttf'
+fontprop = fm.FontProperties(fname=font_path)
+
+- 폰트를 추가
+fm.fontManager.addfont(font_path)
+- 폰트를 rcParams에 등록
+plt.rcParams['font.family'] = fontprop.get_name()
+plt.rcParams['axes.unicode_minus'] = False
+
+저자는 폰트 경로를 별도로 지정하기보다 한글 그래프에 적용할 폰트를 작업폴더에 함께 넣어두고 사용한다.
+:::
+<br>
+
+## 바(Bar) 그래프
+- 범주형 데이터를 막대로 표현하여 각 범주의 크기를 비교하는 데 사용되는 바 그래프를 그리되 한글 폰트 적용법을 알았으니 한글을 추가해 보자.
+
+```{python}
+#| code-fold: true
+# 패키지 불러오기
+import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
+
+# 작업 폴더 내 NanumGothic.ttf 폰트를 등록하고 설정
+font_path = 'NanumGothic.ttf'
+fontprop = fm.FontProperties(fname=font_path)
+
+# 폰트를 추가
+fm.fontManager.addfont(font_path)
+# 폰트를 rcParams에 등록
+plt.rcParams['font.family'] = fontprop.get_name()
+plt.rcParams['axes.unicode_minus'] = False
+```
+<br>
+
+```{python}
+sns.barplot(data=df, x='country', y='gdp')
+plt.title('국가별 평균 GDP')
+plt.show()
+```
+<br>
+
+- 이번에는 Naboo GDP 변화만 그려보자. Seaborn의 `barplot`은 기본적으로 범주별로 다른 색을 적용하므로 여기서는 `color='skyblue'` 옵션을 사용해 한가지 색을 특정한다.
+
+```{python}
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Wakanda의 데이터를 필터링
+Naboo_data = df[df['country'] == 'Naboo']
+
+# 데이터 시각화
+sns.barplot(data=Naboo_data, x='year', y='gdp', color='skyblue')
+plt.title('Naboo 연도별 GDP')
+plt.show()
+```
+<br>
+
+## 히스토그램
+- 데이터의 분포를 시각화하여 값이 특정 구간에 얼마나 자주 나타나는지를 막대 형태로 표현한 그래프인 히스토그램을 그려보자.
+
+```{python}
+sns.histplot(data=df, x='gdp')
+plt.title('GDP 분포')
+plt.show()
+```
+<br>
+
+- Y 축을 밀도(density)로 변경해보자.
+
+```{python}
+sns.histplot(data=df, x='gdp', stat="density")
+plt.title('GDP 분포')
+plt.show()
+```
+<br>
+
+- 막대의 넓이 50으로 조정해보자.
+
+```{python}
+sns.histplot(data=df, x='gdp', stat="density", binwidth=50)
+plt.title('GDP 분포')
+plt.show()
+```
+<br>
+
+- 막대의 갯수를 20으로 조정해보자.
+
+```{python}
+sns.histplot(data=df, x='gdp', stat="density", bins=20)
+plt.title('GDP 분포')
+plt.show()
+```
+<br>
+
+- 커널밀도함수를 추가해보자.
+
+```{python}
+sns.histplot(data=df, x='gdp', stat="density", kde=True)
+plt.title('GDP 분포')
+plt.show()
+```
+<br>
+
+- 처리 여부에 따라 구분해보자.
+
+```{python}
+sns.histplot(data=df, x='gdp', stat="density", hue='treated')
+plt.title('GDP 분포')
+plt.show()
+```
+<br>
+
+- 아래 표는 히스토그램에 적용 가능한 일부 옵션이다.
+<br>
+
+| 옵션       | 유형                          | 설명                                                                                      |
+|------------|-------------------------------|-------------------------------------------------------------------------------------------|
+| binwidth   | number or pair of numbers      | 각 빈의 너비를 설정하며, bins 옵션을 무시하고 binrange와 함께 사용할 수 있습니다.       |
+| bins       | str, number, vector, or pair   | 빈의 수, 또는 빈의 경계를 정의합니다. numpy.histogram_bin_edges()에 전달됩니다.          |
+| kde        | bool                           | True로 설정하면 커널 밀도 추정(KDE)을 계산하여 분포를 부드럽게 하고 그래프에 라인을 추가합니다.|
+| hue        | vector or key in data          | 플롯 요소의 색상을 결정하기 위해 매핑되는 의미적 변수입니다.                              |
+| discrete   | bool                           | True로 설정하면 binwidth=1로 설정되고, 막대가 해당 데이터 포인트에 맞춰 정렬되며, 이산형 데이터에서 발생할 수 있는 '갭'을 방지합니다. |
+| shrink     | number                         | 각 막대의 너비를 binwidth에 비례하여 이 인자로 조정합니다.                               |
+| log_scale  | bool, number, or pair of bools | 축 스케일을 로그로 설정합니다. 단일 값은 모든 수치 축에 적용되며, 쌍(pair)의 값은 각 축을 독립적으로 설정합니다. |
+| fill       | bool                           | True로 설정하면 히스토그램 아래의 공간이 채워집니다.                                      |
+
+<br>
+
+
+## 산점도(Scatter Plot)
+- 두 변수의 관계를 나타내는 산점도를 그려보자.
+<br>
+
+```{python}
+sns.scatterplot(data=df, x='corruption', y='gdp', hue='country')
+plt.title('GDP 대 부패도')
+plt.show()
+```
+<br>
+
+- 산점도에 적용 가능한 옵션은 아래와 같다.
+<br>
+
+
+| 옵션        | 유형                                                | 설명                                                                                           |
+|-------------|-----------------------------------------------------|------------------------------------------------------------------------------------------------|
+| hue         | vector or key in data                               | 다른 색상을 가진 점을 생성하는 그룹 변수입니다. 범주형 또는 수치형이 될 수 있습니다.        |
+| size        | vector or key in data                               | 다른 크기의 점을 생성하는 그룹 변수입니다. 범주형 또는 수치형이 될 수 있습니다.            |
+| style       | vector or key in data                               | 다른 마커를 가진 점을 생성하는 그룹 변수입니다. 숫자형일 수 있지만 항상 범주형으로 처리됩니다.|
+| palette     | string, list, dict, or matplotlib.colors.Colormap    | 색상 매핑에 사용할 색상 선택 방법입니다. 문자열 값은 color_palette()에 전달되며, 목록이나 사전은 범주형 매핑을 의미합니다. |
+| hue_order   | vector of strings                                    | hue 의미적 변수의 범주 수준에 대한 처리 및 플로팅 순서를 지정합니다.                        |
+| hue_norm    | tuple or matplotlib.colors.Normalize                 | 데이터 단위에서 정규화 범위를 설정하거나 데이터 단위를 [0, 1] 간격으로 매핑하는 객체입니다. |
+| sizes       | list, dict, or tuple                                 | size가 사용될 때 크기를 선택하는 방법을 결정하는 객체입니다.                                |
+| size_order  | list                                                 | 크기 변수 수준의 순서를 지정합니다. 크기 변수가 숫자인 경우 관련이 없습니다.               |
+| size_norm   | tuple or Normalize object                            | 크기 변수가 숫자일 때 플롯 객체의 크기를 스케일링하기 위한 데이터 단위에서의 정규화입니다. |
+| markers     | boolean, list, or dictionary                         | 스타일 변수의 다른 수준에 대한 마커를 그리는 방법을 결정하는 객체입니다.                    |
+| style_order | list                                                 | 스타일 변수 수준의 순서를 지정합니다. 스타일 변수가 숫자인 경우 관련이 없습니다.           |
+| legend      | “auto”, “brief”, “full”, or False                    | 범례를 그리는 방법입니다. 'brief'는 숫자형 hue 및 size 변수를 균일하게 간격을 둔 샘플로 나타내고, 'full'은 모든 그룹에 대한 항목을 범례에 추가합니다. |
+| ax          | matplotlib.axes.Axes                                 | 플롯을 위한 기존의 축(axes)입니다. 그렇지 않으면 matplotlib.pyplot.gca()를 내부적으로 호출합니다.  |
+<br>
+
+
+## ChatGPT를 이용해 그래프 그리기
+- 위 사례처럼 일부 옵션을 조정하는 것도 가능하지만, ChatGPT에게 다양한 지시를 통해 그래프를 그리는 것도 가능하다. 예를 들면 아래와 같은 질문을 통해 코드를 얻을 수 있다.
+  - (ChatGPT 질문):  gpd와 corruption을 이용해 treated에 따라 scatter를 병렬로 배치하는 코드를 제시해줘
+<br>
+
+```{python}
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+
+data = pd.read_csv('gdp.csv')
+
+# 데이터 프레임을 Treated 값에 따라 분할
+treated_data = data[data['treated'] == 1]
+not_treated_data = data[data['treated'] == 0]
+
+# 플롯 크기 설정
+fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(14, 6))
+
+# Treated 데이터 산포도
+sns.scatterplot(x='corruption', y='gdp', data=treated_data, ax=axes[0])
+axes[0].set_title('Treated')
+axes[0].set_xlabel('Corruption')
+axes[0].set_ylabel('GDP')
+
+# Not Treated 데이터 산포도
+sns.scatterplot(x='corruption', y='gdp', data=not_treated_data, ax=axes[1])
+axes[1].set_title('Not Treated')
+axes[1].set_xlabel('Corruption')
+axes[1].set_ylabel('GDP')
+
+# 플롯 보여주기
+plt.show()
+```
+<br>
+
+- 여기에 추가적인 수정을 요청할 수 있다.
+- (ChatGPT 질문): 양쪽 그림의 마커의 모양과 색상을 변경해줘
+
+```{python}
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+
+data = pd.read_csv('gdp.csv')
+
+# 데이터 프레임을 Treated 값에 따라 분할
+treated_data = data[data['treated'] == 1]
+not_treated_data = data[data['treated'] == 0]
+
+# 플롯 크기 설정
+fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(14, 6))
+
+# Treated 데이터 산포도
+sns.scatterplot(x='corruption', y='gdp', data=treated_data, ax=axes[0], s=100, color='blue', marker='o')
+axes[0].set_title('Treated')
+axes[0].set_xlabel('Corruption')
+axes[0].set_ylabel('GDP')
+
+# Not Treated 데이터 산포도
+sns.scatterplot(x='corruption', y='gdp', data=not_treated_data, ax=axes[1], s=100, color='red', marker='s')
+axes[1].set_title('Not Treated')
+axes[1].set_xlabel('Corruption')
+axes[1].set_ylabel('GDP')
+
+# 플롯 보여주기
+plt.show()
+```
+<br>
+
+- 혹은 아래와 같은 방법으로 그래프를 그리는 것도 가능하다.
+<br>
+
+- 기존에 그렸던 그래프 혹은 웹사이트에서 본 그래프를 ChatGPT에 첨부해서 파이썬 그래프로 그려달라고 할 수도 있다. 혹은 기존에 사용했던 프로그램의 코드를 ChatGPT에 입력하고 파이썬으로 표현해 달라고 하는 것도 가능하다.
+- 예를 들면 아래 왼쪽 그래프는 저자가 그림판으로 그린 그래프이고, 오른쪽은 STATA로 그린 그래프이다. 아래 그래프를 ChatGPT에 첨부 후 파이썬 코드를 달라고 하면 유사한 그래프를 그릴 수 있는 예시 코드를 제시해준다.
+<br>
+
+::: {#fig-graphs layout-ncol=2}
+![그림판](images/Graph.png){#fig-graph1 width=7.5%}
+
+![STATA](images/histogram.png){#fig-graph2 width=7.5%}
+
+외부 프로그램을 이용한 그래프 예시
+:::
+
+
+# 연습문제
+<br>
+
+1. 데이터 불러오기 및 기본 정보 확인
+  - Iris 데이터셋을 seaborn의 load_dataset 함수를 이용해 불러오세요.
+  - 데이터의 기본 정보를 확인하고, 각 열의 데이터 타입, 결측치 여부, 기본 통계량 등을 출력하세요.
+
+  
+```{python}
+#| code-fold: true
+#| eval: false
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+iris = sns.load_dataset("iris")
+print(iris.info())
+print(iris.describe())
+```
+<br>
+
+2. 산점도 그리기
+  - sepal_length와 sepal_width의 관계를 나타내는 산점도를 그리세요. 이때, 꽃의 종류(species)에 따라 색상을 다르게 표현하세요.
+
+
+```{python}
+#| code-fold: true
+#| eval: false
+sns.scatterplot(data=iris, x="sepal_length", y="sepal_width", hue="species")
+plt.title("Sepal Length vs Sepal Width")
+plt.show()
+```
+<br>
+
+3.  히스토그램 및 커널 밀도 추정 (KDE)
+  - 각 수치형 변수(sepal_length, sepal_width, petal_length, petal_width)에 대해 히스토그램과 커널 밀도 추정(KDE) 그래프를 그리세요. 이때, 꽃의 종류(species)에 따라 색상을 다르게 표현하고, 한 그래프에 제시하세요.
+
+
+```{python}
+#| code-fold: true
+#| eval: false
+
+# 서브플롯 생성 (2x2 레이아웃)
+fig, axs = plt.subplots(2, 2, figsize=(12, 10))
+
+# Sepal Length의 히스토그램 및 KDE
+sns.histplot(data=iris, x="sepal_length", hue="species", kde=True, ax=axs[0, 0])
+axs[0, 0].set_title("Histogram and KDE of Sepal Length")
+
+# Sepal Width의 히스토그램 및 KDE
+sns.histplot(data=iris, x="sepal_width", hue="species", kde=True, ax=axs[0, 1])
+axs[0, 1].set_title("Histogram and KDE of Sepal Width")
+
+# Petal Length의 히스토그램 및 KDE
+sns.histplot(data=iris, x="petal_length", hue="species", kde=True, ax=axs[1, 0])
+axs[1, 0].set_title("Histogram and KDE of Petal Length")
+
+# Petal Width의 히스토그램 및 KDE
+sns.histplot(data=iris, x="petal_width", hue="species", kde=True, ax=axs[1, 1])
+axs[1, 1].set_title("Histogram and KDE of Petal Width")
+
+# 레이아웃 조정
+plt.tight_layout()
+plt.show()
+```
+<br>
