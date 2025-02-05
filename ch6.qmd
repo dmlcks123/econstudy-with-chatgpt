@@ -1,0 +1,735 @@
+---
+title: "Ch6. 텍스트마이닝 활용하여 경제 데이터분석"
+Author: "Euichan hwang"
+date: "2025-02-05"
+version: v3
+format:
+  docx:
+    toc: false
+    number-sections: true
+    highlight-style: pygments
+    reference-doc: index.docx    
+---
+
+# 학습목표{.unnumbered}
+- 자연어 처리(NLP) 소개
+- 텍스트 데이터 전처리
+- 텍스트 데이터 분석
+<br>
+
+# 세부 학습내용{.unnumbered}
+1. 텍스트 정제 및 정규화
+2. 텍스트 표현 방법
+3. 감성분석 및 데이터 시각화
+<br>
+
+# 자연어 처리(NLP)란 무엇인가?
+::: {.callout-tip}
+자연어 처리(Natural Language Processing, NLP)는 인간의 언어를 컴퓨터가 이해하고 해석할 수 있도록 하는 기술 및 방법론입니다. NLP는 텍스트 및 음성 데이터의 분석, 이해, 생성에 활용되며, 언어 모델, 텍스트 전처리, 문서 분류, 감성 분석 등 다양한 응용 분야를 포함합니다.
+:::
+<br>
+
+::: {.callout-note title="ChatGPT에 질문하기"}
+1. 파이썬에서 특수문자, 숫자, 공백, 불용어 제거하는 방법을 알려줘 
+2. 토큰화의 개념을 알려주고 파이썬에서 구현하는 방법에 대해 알려줘
+3. 정규 표현식에 대해 설명해줘
+:::
+
+## 텍스트 데이터 전처리
+<br>
+
+- 텍트스 데이터 전처리는 분석에서 집중하고 하는 데이터만 남겨두는 뼈와 살을 발라내는 작업이다. 일반적으로 특수문자, 숫자 데이터는 관심대상이 아니기 때문에 삭제하고 데이터 종류(영문, 한글)에 따라 전처리 방법은 달라진다. 그 이유는 정규표현식을 사용하는 방법이 다르기 때문이며 단순하게 컴퓨터가 인식할 수 있도록 영문을 표현하는 방법과 한글을 표현하는 방법이 다르다고 생각하면 좋다.
+<br>
+
+### 텍스트 정제 및 정규화
+
+- 편의를 위해 텍스트를 정제하는 함수를 생성하고 함수의 기능에 특수문자, 숫자, 영문을 제거하는 기능을 포함한다. 텍스트 원문 데이터가 함수를 통해 정제되며 구현방식은 re의 sub()을 활용하여 특정 텍스트를 찾아내고 ""와 같이 공란으로 특정 텍스트를 대체하는 방식으로 진행된다. 예제에서는 영문자를 소문자로 바꾸고 영문을 제거하고 특수문자 및 숫자를 제거하는 방식으로 전처리가 진행된다.
+
+```python
+import re
+
+# 텍스트 정제 함수
+def clean_text(text):
+    text = text.lower()  # 소문자로 변환
+    text = re.sub(r'[a-z]', '', text) # 영문 제거
+    text = re.sub(r'[^가-힣\s]', '', text)  # 특수문자 제거
+    text = re.sub(r'\d+', '', text)  # 숫자 제거
+    return text
+
+# 실습 파일을 활용한 데이터 정제
+cleaned_data = [clean_text(line) for line in text_data]
+print(cleaned_data[:5])
+```
+<br>
+
+::: {.callout-tip}
+정규 표현식(Regex, Regular Expression)은 특정한 패턴을 가진 문자열을 검색, 추출, 치환하는데 사용되는 강력한 문자열 처리 기술이다.
+:::
+
+<br>
+
+
+- 1️⃣ 문자 패턴
+
+| 패턴  | 의미                                      | 예제                                   |
+|------|-----------------------------------------|--------------------------------------|
+| `.`  | 아무 문자 (1개)                          | `"a.c"` → `"abc"`, `"a3c"` (o) `"ac"` (x) |
+| `\d` | 숫자 (`[0-9]`)                           | `"a\d"` → `"a1"`, `"a9"` (o) `"abc"` (x) |
+| `\D` | 숫자가 아닌 문자 (`[^0-9]`)              | `"a\D"` → `"ab"`, `"a!"` (o) `"a3"` (x) |
+| `\w` | 알파벳 + 숫자 (`[a-zA-Z0-9_]`)           | `"a\w"` → `"a1"`, `"ab"`, `"a_"` (o) `"a!"` (x) |
+| `\W` | 특수문자 (`[^a-zA-Z0-9_]`)               | `"a\W"` → `"a!"`, `"a@"` (o) `"a3"` (x) |
+| `\s` | 공백 문자 (스페이스, 탭, 줄바꿈)         | `"a\s"` → `"a "`, `"a\t"` (o) `"a1"` (x) |
+| `\S` | 공백이 아닌 문자                        | `"a\S"` → `"a1"`, `"aA"` (o) `"a "` (x) |
+
+<br>
+
+
+- 2️⃣ 반복 패턴
+
+| 패턴  | 의미                   | 예제                                    |
+|------|------------------------|---------------------------------------|
+| `*`  | 0개 이상 반복 (`{0,}`)  | `"ab*c"` → `"ac"`, `"abc"`, `"abbc"`  |
+| `+`  | 1개 이상 반복 (`{1,}`)  | `"ab+c"` → `"abc"`, `"abbc"` (o) `"ac"` (x) |
+| `?`  | 0개 또는 1개 (`{0,1}`)  | `"ab?c"` → `"ac"`, `"abc"`            |
+| `{n}`  | 정확히 `n`번 반복       | `"a{2}"` → `"aa"` (o) `"a"` (x)       |
+| `{n,}` | 최소 `n`번 반복        | `"a{2,}"` → `"aa"`, `"aaa"`, `"aaaa"` |
+| `{n,m}` | `n`~`m`번 반복         | `"a{2,4}"` → `"aa"`, `"aaa"`, `"aaaa"` (o) `"a"` (x) |
+
+<br>
+
+- 3️⃣ 특수 패턴
+
+| 패턴  | 의미              | 예제                                    |
+|------|-----------------|---------------------------------------|
+| `^`  | 문자열의 시작     | `^hello` → `"hello world"` (o) `"hi hello"` (x) |
+| `$`  | 문자열의 끝       | `world$` → `"hello world"` (o) `"world hello"` (x) |
+| `[]` | 문자 집합 (or)    | `[abc]` → `"a"`, `"b"`, `"c"` (o) `"d"` (x) |
+| `[^]` | 부정 (not)       | `[^abc]` → `"d"`, `"e"` (o) `"a"` (x) |
+| `( )` | 그룹             | `(\d{3})-(\d{4})` → `"123-4567"` (o) |
+| `\|`  | OR (또는)        | `"apple\|banana"` → `"apple"`, `"banana"` |
+
+
+
+::: {.callout-tip}
+경제 데이터 분석에서는 뉴스 기사, 소셜 미디어, 연구 보고서 등 다양한 텍스트 데이터가 중요한 정보를 담고 있습니다. NLP를 활용하여 이러한 텍스트 데이터를 분석하면 다음과 같은 이점을 얻을 수 있습니다
+
+- 시장 동향 파악: 뉴스 기사와 소셜 미디어 데이터를 분석하여 시장의 현재 상태와 미래 동향을 예측할 수 있습니다.
+
+- 투자 전략 수립: 투자자들이 텍스트 데이터를 기반으로 더 나은 투자 결정을 내릴 수 있습니다.
+
+- 리스크 관리: 텍스트 데이터를 분석하여 잠재적인 리스크를 조기에 발견하고 관리할 수 있습니다.
+:::
+<br>
+
+### 토큰화
+- 토큰화는 텍스트 데이터를 의미 있는 단위(토큰, Token)로 나누는 과정으로 이후 빈도분석이나 감정분석 등 분석으로 가기 위한 필수과정이다. 주로 단어 단위, 문장 단위로 토큰화하며 한국어의 경우 문장의 핵심의미가 명사, 동사에 담겨 있기 때문에 텍스트 문서에서 형태소 단위로 토큰화를 진행한다.
+<br>
+
+- 단어 단위 토큰화
+```{python}
+# 단어 단위 토큰화
+import nltk
+nltk.download('punkt')
+nltk.download('punkt_tab')
+
+from nltk.tokenize import word_tokenize
+
+# 실습 파일을 활용한 토큰화
+tokenized_text = [word_tokenize(line) for line in cleaned_data]
+print(tokenized_text[:5])
+```
+
+```{python}
+!pip install konlpy
+```
+<br>
+
+- 형태소 단위 토큰화
+```{python}
+# 한국어 형태소 단위 토큰화
+from konlpy.tag import Okt
+
+okt = Okt()
+
+text = "안녕하세요. 저는 자연어 처리를 공부하고 있습니다."
+
+# 형태소 단위로 토큰화
+tokens = okt.morphs(text)
+
+print(tokens)
+# 출력: ['안녕하세요', '.', '저', '는', '자연어', '처리', '를', '공부', '하고', '있습니다', '.']
+```
+
+### 불용어 처리
+- 특수문자를 제거하더라도 텍스트 문서에서 의미가 없는 부분은 다수 존재한다. 텍스트 문서를 확인하면서 일일이 제거하는 것이 분석의 정확성을 높이지만 문서가 방대할 경우 그렇게 할 수 없다. 따라서 의미가 없는 부분들을 따로 모아서 일종의 사전 형태의 불용어 리스트가 있고 이 리스트를 활용하여 텍스트 문서에서 의미없는 부분을 쉽게 제거할 수 있다. 예를들어 nltk 패키지 stopwords를 사용하여 불용어를 한번에 처리할 수 있다. 그러나 stopwords는 영어 불용어 리스트만 해당되고 한국어 불용어 리스트를 처리하기 위해서 별도의 불용어 사전을 활용하여야 한다.
+<br>
+
+- 영어 불용어 처리
+```{python}
+# 영어 불용어 처리
+from nltk.corpus import stopwords
+nltk.download('stopwords')
+
+stop_words = set(stopwords.words('english'))
+filtered_text = [[word for word in line if word not in stop_words] for line in tokenized_text]
+print(filtered_text[:5])
+```
+<br>
+
+- 한국어 불용어 처리
+```{python}
+# 한국어 불용어 처리
+import nltk
+from nltk.tokenize import word_tokenize
+import requests
+
+# Download 'punkt_tab' if not already downloaded
+nltk.download('punkt_tab')
+
+# 한국어 불용어 리스트 다운로드
+url = "https://raw.githubusercontent.com/stopwords-iso/stopwords-ko/master/stopwords-ko.txt"
+stopwords_ko = set(requests.get(url).text.split("\n"))
+
+print("불용어 개수:", len(stopwords_ko))
+print("일부 불용어:", list(stopwords_ko)[:10])
+
+# 샘플 텍스트
+text = "이것은 샘플 문장입니다. 그리고 불용어를 제거할 것입니다."
+
+# 토큰화
+tokens = word_tokenize(text)
+
+# 불용어 제거
+filtered_tokens = [word for word in tokens if word not in stopwords_ko]
+
+print(filtered_tokens)
+```
+<br>
+
+- 불용어 리스트를 다운받지 않고 직접 불용어를 설정하여 전처리를 진행할 수 있다.
+<br>
+
+```{python}
+
+# 직접 불용어 설정하기
+from konlpy.tag import Okt
+import re
+
+okt = Okt()
+
+# 원본 텍스트
+text = "이것은 예제 문장입니다! 123 This is a Sample Sentence."
+
+# 불용어 제거
+stopwords = ['이것은', '예제']
+cleaned_text = ' '.join([word for word in text.split() if word not in stopwords])
+
+# 특수문자 제거
+cleaned_text = re.sub(r'[^가-힣\s]', '', cleaned_text)
+
+# 대소문자 변환 (영어 텍스트만 해당)
+cleaned_text = cleaned_text.lower()
+
+print(cleaned_text)
+```
+<br>
+
+## 텍스트 표현 방법
+- 텍스트 문서를 전처리하고 토큰화한 이후 빈도 분석을 수행하며 이는 정형 데이터 분석에서 탐색적 데이터 분석(EDA)에 해당하는 부분이라고 생각하면 좋다. 빈도 분석을 통해 텍스트 문서에서 특정 토큰(단어)이 얼마나 많이 등장했는지에 따라 텍스트의 전체 구조를 파악할 수 있으며 방법은 크게 bow(bag of words)와 tf-idf가 있다. bow의 경우 단어의 빈도 수만 파악할 수 있으며 tf-idf는 문서에서 bow보다 상대적으로 더 중요한 단어를 파악할 수 있다. 그 이유는 bow는 단어의 단순 빈도를 측정하는 반면 tf-idf는 문서집합 전체에서 자주 등장하는 단어는 분모에 가중치를 두어 tf-idf 값이 작게 측정되고 문서집합에서 상대적으로 용이한 단어를 파악할 수 있다.
+
+::: {.callout-note title="ChatGPT에 질문하기"}
+1. 텍스트 표현 방법인 bag of word와 tf-idf에 대해 설명해줘
+:::
+
+### bag of words(BoW)
+- 텍스트를 단어(토큰)별로 나누고, 각 단어의 등장 회수를 표현하는 것
+- bow는 단어의 순서를 고려하지 않고 단어(토큰)별 빈도 수를 파악하는 것으로 아래 예시와 같이 표현할 수 있다. 이 방법의 단점은 단순히 빈도 수를 계산하므로 의미 없는 단어가 많이 등장할때 중요한 단어를 식별하기 어렵다.
+
+문장1: "나는 사과를 좋아한다"
+문장2: "나는 바나나를 좋아한다"
+문장3: "사과와 바나나는 맛있다"
+
+|단어	|문장1	|문장2	|문장3  |
+|-------|-------|-------|-------|
+|나는	|1	|1	|0  |
+|사과를	|1	|0	|0  |
+|좋아한다	|1	|1	|0  |
+|바나나를	|0	|1	|0  |
+|사과와 |0	|0	|1  |
+|바나나는	|0	|0	|1  |
+|맛있다	|0	|0	|1  |
+
+<br>
+
+```{python}
+# sklearn의 CountVectorizer를 불러옴 (BoW 모델 생성)
+from sklearn.feature_extraction.text import CountVectorizer
+
+# CountVectorizer 객체 생성 (단어 빈도를 기반으로 벡터화)
+vectorizer = CountVectorizer()
+
+# 텍스트 데이터를 BoW로 변환 (cleaned_data는 전처리된 텍스트 리스트)
+X = vectorizer.fit_transform(cleaned_data)
+
+# 생성된 단어 사전(Feature Names) 출력
+print(vectorizer.get_feature_names_out())
+
+# BoW 표현된 행렬을 배열 형태로 변환하여 출력
+print(X.toarray())
+```
+
+### TF-IDF(Term Frequency - Inverse Document Frequency)
+- TF-IDF는 BoW의 단점을 보완한 기법으로 단어의 빈도수(TF)뿐 아니라 문서 내에서 중요도를 반영한 가중치를 계산한다. 
+- TF-IDF = TF * IDF
+- TF(t) = 단어 t의 등장 횟수 / 문서 내 전체 단어 수
+- IDF(t) = log(총 문서 수 / 단어 t를 포함한 문서 수 + 1)
+- 이 계산방식은 흔한 단어일 수록 IDF 값이 낮아져 가중치가 작아진다.
+
+<br>
+
+```{python}
+# scikit-learn의 TfidfVectorizer 라이브러리를 불러옴 (TF-IDF 모델 생성)
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+# TfidfVectorizer 객체 생성 (TF-IDF 기반으로 텍스트를 숫자로 변환하는 도구)
+tfidf_vectorizer = TfidfVectorizer()
+
+# 텍스트 데이터를 TF-IDF 방식으로 변환 (cleaned_data는 전처리된 텍스트 리스트)
+X_tfidf = tfidf_vectorizer.fit_transform(cleaned_data)
+
+# 변환된 TF-IDF 행렬을 배열 형태로 변환하여 출력
+print(X_tfidf.toarray())
+```
+<br>
+
+## 감성분석(Sentiment Analysis)
+- 감성분석은 텍스트 문서에 담겨있는 감성 스코어를 계산하여 해당 문서의 논조가 긍정인지 부정인지 판단한다. 문서에서 긍정 단어 비율, 부정 단어 비율을 계산하여 점수를 정규화하는 과정이 일반적이며 textbolb 라이브러리의 경우 영어 기반으로 작동되며 극성점수(-1,부정적 ~ 1,긍정적)와 주관성 점수(0,객관적 ~ 1,주관적)를 제공한다. 
+<br>
+
+- textblob 
+```{python}
+# TextBlob 라이브러리 불러오기 (텍스트 감성 분석을 위한 라이브러리)
+from textblob import TextBlob
+
+# 감성 분석을 수행할 샘플 텍스트 (영어 문장)
+sample_text = "I really love this product! It's amazing."
+
+# TextBlob을 사용하여 감성 점수(polarity) 계산
+# sentiment.polarity 값은 -1(부정적) ~ 1(긍정적) 범위의 감성 점수를 반환
+sentiment_score = TextBlob(sample_text).sentiment.polarity
+
+# 감성 점수 출력
+print(f'Sentiment Score: {sentiment_score}')
+```
+<br>
+
+- soyNLP
+```{python}
+pip install soynlp
+```
+
+```{python}
+from soynlp.normalizer import emoticon_normalize
+from soynlp.word import WordExtractor
+import pandas as pd
+
+df = pd.DataFrame({'text': text_data})
+
+# 감성 분석을 위한 간단한 스코어링 함수
+def simple_sentiment(text):
+    pos_words = ["좋아요", "좋네요", "유익", "추천", "최고", "기뻐", "행복"]
+    neg_words = ["별로", "싫어요", "최악", "짜증", "후회"]
+    
+    score = sum([1 for word in pos_words if word in text]) - sum([1 for word in neg_words if word in text])
+    
+    return score
+
+# 감성 분석 적용
+df['sentiment'] = df['text'].apply(simple_sentiment)
+
+print(df)
+```
+
+### PyKoSpacing을 이용한 띄어쓰기 교정
+- 토큰화를 통하여 텍스트 분석을 수행해야하는데 텍스트 문서에 띄어쓰기 안되어 있는 경우가 있다. 예를 들면 인터넷 댓글 같은 경우 사전이나 뉴스와 같이 엄격한 띄어쓰기를 사용하지 않아 토큰화의 어려움이 있을 수 있다. 이를 위해 pykospacing 라이브러리를 활용하여 텍스트 문서의 띄어쓰기를 임의로 수행할 수 있다.
+<br>
+
+```{python}
+from pykospacing import Spacing
+from konlpy.tag import Okt
+import re
+
+# 띄어쓰기 교정
+spacing = Spacing()
+text = "해당문장은띄어쓰기가필요합니다"
+corrected_text = spacing(text)
+print("Corrected Text:", corrected_text)
+
+```
+<br>
+
+::: {.callout-tip}
+감정 분석의 활용
+- 감정 분석은 다양한 분야에서 활용될 수 있습니다. 주요 활용 사례는 다음과 같습니다
+- 피드백 분석: 제품 리뷰, 고객 설문조사, 서비스 피드백 등을 분석하여 고객의 감정적 반응을 파악하고, 이를 기반으로 제품 및 서비스 개선에 활용합니다.
+- 소셜 미디어 분석: 트위터, 페이스북, 인스타그램 등의 소셜 미디어 데이터를 분석하여 브랜드에 대한 감정적 반응을 실시간으로 모니터링합니다.
+- 여론 조사 및 정치 분석: 뉴스 기사, 블로그, 포럼 등의 데이터를 분석하여 특정 이슈에 대한 대중의 감정적 반응을 파악하고, 이를 기반으로 여론을 예측합니다.
+마케팅 및 광고 효과 분석: 광고 캠페인, 프로모션 이벤트 등에 대한 대중의 반응을 분석하여 마케팅 전략을 최적화합니다.
+- 의료 및 정신 건강 모니터링: 환자의 텍스트 데이터를 분석하여 정신 건강 상태를 모니터링하고, 필요한 경우 조기 개입을 돕습니다.
+- 영화 및 도서 리뷰 분석: 영화, 도서 등에 대한 리뷰를 분석하여 대중의 반응을 파악하고, 이를 기반으로 콘텐츠 제작 및 마케팅 전략을 수립합니다.
+:::
+<br>
+
+## 텍스트 데이터 시각화
+- 감성분석한 텍스트 데이터를 시각화하기 위해 크게 긍정단어 비율 및 부정단어 비율을 막대그래프 형태로 나타낼 수 있다. 다른 방법으로는 워드클라우드를 사용하여 긍정단어, 부정단어를 시각화할 수 있으며 한국어는 별도의 폰트를 지정해주어야 한다.
+<br>
+
+- 막대그래프
+```{python}
+# 데이터 시각화를 위한 라이브러리 불러오기
+import matplotlib.pyplot as plt  # 기본적인 그래프 그리기
+import seaborn as sns  # 고급 통계 시각화 라이브러리
+
+# 그래프 크기 설정 (가로 6인치, 세로 4인치)
+plt.figure(figsize=(6,4))
+
+# 감성 점수(sentiment) 히스토그램 생성
+# bins=20 → 20개의 구간으로 나누어 히스토그램을 그림
+# kde=True → 커널 밀도 추정(KDE)를 추가하여 분포를 부드럽게 표현
+sns.histplot(df['sentiment'], bins=20, kde=True)
+
+# X축 레이블 설정 (Sentiment Score)
+plt.xlabel('Sentiment Score')
+
+# Y축 레이블 설정 (Frequency)
+plt.ylabel('Frequency')
+
+# 그래프 제목 설정
+plt.title('Sentiment Score Distribution')
+
+# 그래프 출력
+plt.show()
+```
+<br>
+
+- 워드클라우드
+```{python}
+!pip install konlpy wordcloud
+```
+
+```{python}
+# 워드클라우드 생성 라이브러리 불러오기
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+
+# 한국어 형태소 분석기(Okt) 불러오기
+from konlpy.tag import Okt
+
+# Okt 형태소 분석기 객체 생성
+okt = Okt()
+
+# 한국어 명사만 추출하는 함수 정의
+def extract_korean_words(text):
+    return ' '.join(okt.nouns(text))  # 명사만 추출하여 공백으로 연결
+
+# ✅ 긍정 감성 텍스트에서 한국어 명사 추출
+positive_text = ' '.join(df[df['sentiment'] > 0]['text'].apply(extract_korean_words))  # 감성 점수가 0보다 큰 문장의 명사만 추출
+
+# ✅ 긍정 워드클라우드 생성 (단, 데이터가 없으면 경고 메시지 출력)
+if not positive_text.strip():  # 만약 긍정적인 단어가 없다면
+    print("Warning: No positive words found for wordcloud.")  # 경고 메시지 출력
+else:
+    wordcloud_positive = WordCloud(
+       font_path='/content/NanumGothic.ttf',  # 한글 폰트 지정 (Google Colab 환경 기준)
+        background_color='white'  # 배경색: 흰색
+    ).generate(positive_text)  # 긍정적인 단어를 바탕으로 워드클라우드 생성
+
+    # ✅ 그래프 설정
+    plt.figure(figsize=(12, 6))  # 그래프 크기 설정
+    plt.subplot(1, 2, 1)  # 1행 2열 중 첫 번째 서브플롯
+    plt.imshow(wordcloud_positive, interpolation='bilinear')  # 워드클라우드 출력
+    plt.axis("off")  # 축 표시 제거
+    plt.title("Positive Sentiment")  # 그래프 제목 설정
+
+# ✅ 부정 감성 텍스트에서 한국어 명사 추출
+negative_text = ' '.join(df[df['sentiment'] <= 0]['text'].apply(extract_korean_words))  # 감성 점수가 0 이하인 문장의 명사만 추출
+
+# ✅ 부정 워드클라우드 생성 (데이터가 없으면 경고 메시지 출력)
+if not negative_text.strip():  # 만약 부정적인 단어가 없다면
+    print("Warning: No negative words found for wordcloud.")  # 경고 메시지 출력
+else:
+    wordcloud_negative = WordCloud(
+        font_path='/content/NanumGothic.ttf',  # 한글 폰트 지정
+        background_color='black'  # 배경색: 검정색
+    ).generate(negative_text)  # 부정적인 단어를 바탕으로 워드클라우드 생성
+
+    # ✅ 부정 감성 워드클라우드 시각화
+    plt.subplot(1, 2, 2)  # 1행 2열 중 두 번째 서브플롯
+    plt.imshow(wordcloud_negative, interpolation='bilinear')  # 워드클라우드 출력
+    plt.axis("off")  # 축 표시 제거
+    plt.title("Negative Sentiment")  # 그래프 제목 설정
+
+# ✅ 그래프 출력
+plt.show()
+```
+- 반드시 colab 작업폴더에 NanumGothic.ttf을 올려주어야한다.
+
+# 연습문제
+- 파이썬을 이용해 뉴스기사를 크롤링하여 수집된 기사의 요약, 키워드, 감정분석 진행해 보기
+<br>
+
+## 뉴스기사 크롤링
+```{python}
+## 1. 뉴스기사 크롤링
+
+# 크롬 드라이버 설정
+options = webdriver.ChromeOptions()
+options.add_argument('--headless')  # 크롬창이 뜨지 않게 설정
+options.add_argument('--no-sandbox')
+options.add_argument('--disable-dev-shm-usage')
+driver = webdriver.Chrome(options=options)
+
+# 연합 뉴스 경제 페이지로 이동
+url = 'https://www.yna.co.kr/economy/all'
+driver.get(url)
+
+# 페이지 배율 줄이기 (줌 아웃)
+driver.execute_script("document.body.style.zoom='50%'")
+time.sleep(2)
+
+# 페이지 스크롤 끝까지 내리기
+last_height = driver.execute_script("return document.body.scrollHeight")
+while True:
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    time.sleep(2)
+    new_height = driver.execute_script("return document.body.scrollHeight")
+    if new_height == last_height:
+        break
+    last_height = new_height
+
+# 페이지 소스 가져오기
+page_source = driver.page_source
+driver.quit()
+
+# BeautifulSoup을 사용하여 페이지 파싱
+soup = BeautifulSoup(page_source, 'html.parser')
+news_data = []
+
+# 뉴스 기사 요소 찾기
+news_elements = soup.select('div.list-type038 ul.list li')
+
+for element in news_elements:
+    try:
+        # 제목과 링크 수집
+        link_element = element.select_one('a.tit-wrap')
+        title = link_element.text.strip()
+        link = link_element['href']
+
+        # 시간 수집
+        time_element = element.select_one('span.txt-time')
+        time_text = time_element.text.strip() if time_element else ""
+
+        news_data.append({
+            'title': title,
+            'link': link,
+            'time': time_text
+        })
+    except Exception as e:
+        continue
+
+# 수집한 데이터를 CSV 파일로 저장
+current_time = datetime.now().strftime('%Y%m%d_%H%M%S')
+file_name = f'{current_time}.csv'
+
+with open(file_name, mode='w', newline='', encoding='utf-8-sig') as file:
+    writer = csv.DictWriter(file, fieldnames=['title', 'link', 'time'])
+    writer.writeheader()
+    writer.writerows(news_data)
+
+print(f'Data saved to {file_name}')
+```
+
+## 수집 된 기사 토큰화
+```{python}
+# 텍스트 전처리 및 토크나이즈 함수 정의
+okt = Okt()
+spacing = Spacing()
+
+def preprocess_text(text):
+    # 특수문자 제거
+    text = re.sub(r'[^가-힣\s]', '', text)
+    # 띄어쓰기 교정
+    text = spacing(text)
+    # 불용어 제거
+    stopwords = ['에', '에게', '은', '는', '이', '가', '을', '를', '저', '여기', '연합뉴스']
+    text = ' '.join([word for word in text.split() if word not in stopwords])
+    return text
+
+def tokenize_text(text):
+    return okt.morphs(text)
+
+# 기사 내용을 수집하는 함수
+def get_article_body(url):
+    driver.get(url)
+    time.sleep(2)  # 페이지가 로드될 시간을 주기 위해 추가
+    html = driver.page_source
+    soup = BeautifulSoup(html, 'html.parser')
+
+    # 기사 본문 내용 추출 (모든 <p> 태그를 대상으로 함)
+    content = soup.find_all('p')
+    article_text = ""
+    for paragraph in content:
+        article_text += paragraph.get_text().strip() + " "
+
+    return article_text.strip()
+
+# 크롬 드라이버 설정
+options = webdriver.ChromeOptions()
+options.add_argument('--headless')  # 크롬창이 뜨지 않게 설정
+options.add_argument('--no-sandbox')
+options.add_argument('--disable-dev-shm-usage')
+driver = webdriver.Chrome(options=options)
+
+# 기사 내용 수집
+articles_body = [get_article_body(article['link']) for article in news_data]
+
+# 전처리 및 토크나이즈 적용
+processed_bodies = [preprocess_text(body) for body in articles_body]
+tokenized_bodies = [tokenize_text(body) for body in processed_bodies]
+
+# 크롬 드라이버 종료
+driver.quit()
+
+# 단어별 언급 횟수를 바탕으로 데이터프레임 생성
+word_counts_list = []
+for i, tokens in enumerate(tokenized_bodies):
+    word_counts = pd.Series(tokens).value_counts()
+    word_counts.name = news_data[i]['title']
+    word_counts_list.append(word_counts)
+
+df = pd.concat(word_counts_list, axis=1).fillna(0).astype(int)
+print(df)
+
+# 데이터프레임을 엑셀 파일로 저장
+current_time = datetime.now().strftime('%Y%m%d_%H%M%S')
+excel_file_name = f'word_counts_{current_time}.xlsx'
+df.to_excel(excel_file_name)
+print(f'DataFrame saved to {excel_file_name}')
+```
+
+## 토큰화된 데이터 기사별 요약, 키워드, 감정분석
+
+```{python}
+## 수집된 기사 요약, 키워드, 감정분석
+
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, AutoModelForSeq2SeqLM, pipeline
+from konlpy.tag import Okt
+import torch
+from transformers import BertTokenizer, BertForSequenceClassification
+import torch.nn.functional as F
+
+
+# CSV 파일 불러오기
+file_path = '/content/20240718_022815.csv'
+df = pd.read_csv(file_path)
+
+# 요약 모델 로드 (PyTorch 사용)
+summarizer_model_name = "lcw99/t5-base-korean-text-summary"
+summarizer_tokenizer = AutoTokenizer.from_pretrained(summarizer_model_name)
+summarizer_model = AutoModelForSeq2SeqLM.from_pretrained(summarizer_model_name)
+summarizer = pipeline("summarization", model=summarizer_model, tokenizer=summarizer_tokenizer, framework="pt")
+
+# 감정 분석 모델 로드 (PyTorch 사용)
+sentiment_model_name = "WhitePeak/bert-base-cased-Korean-sentiment"
+sentiment_model = AutoModelForSequenceClassification.from_pretrained(sentiment_model_name)
+sentiment_tokenizer = AutoTokenizer.from_pretrained(sentiment_model_name)
+sentiment_analyzer = pipeline("sentiment-analysis", model=sentiment_model, tokenizer=sentiment_tokenizer)
+
+# 형태소 분석기 로드
+okt = Okt()
+
+# 기사 내용을 수집하고 요약 및 키워드 추출, 감정 분석 수행
+def fetch_article_content(url):
+    try:
+        response = requests.get(url)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        paragraphs = soup.find_all('p')
+        content = ' '.join([para.get_text() for para in paragraphs])
+        return content
+    except Exception as e:
+        return None
+
+def extract_keywords(text, top_n=5):
+    nouns = okt.nouns(text)
+    freq_dist = pd.Series(nouns).value_counts()
+    keywords = freq_dist.head(top_n).index.tolist()
+    return keywords
+
+def summarize_text(text):
+    try:
+        if len(text) < 100:
+            return text
+        inputs = summarizer_tokenizer.encode("summarize: " + text, return_tensors="pt", max_length=512, truncation=True)
+        summary_ids = summarizer_model.generate(inputs, max_length=150, min_length=30, length_penalty=2.0, num_beams=4, early_stopping=True)
+        summary = summarizer_tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+        return summary
+    except Exception as e:
+        return "요약 실패"
+
+def analyze_sentiment(text):
+    # 텍스트를 토큰 단위로 나누기
+    max_length = 512
+    tokens = sentiment_tokenizer.tokenize(text)
+
+    # 토큰을 512 길이 이하로 나누기
+    chunks = [' '.join(tokens[i:i + max_length]) for i in range(0, len(tokens), max_length)]
+    sentiments = []
+    for chunk in chunks:
+        inputs = sentiment_tokenizer(chunk, return_tensors="pt", truncation=True, padding=True, max_length=max_length)
+        with torch.no_grad():
+            outputs = sentiment_model(**inputs)
+        sentiment = torch.argmax(outputs.logits, dim=-1).item()
+        sentiments.append(sentiment)
+
+    # 다수결로 최종 감정 결정
+    sentiment = max(set(sentiments), key=sentiments.count)
+    sentiment_labels = ["매우 부정적", "부정적", "중립적", "긍정적", "매우 긍정적"]
+    return sentiment_labels[sentiment]
+
+# 새로운 칼럼 추가
+df['summary'] = ''
+df['keywords'] = ''
+df['sentiment'] = ''
+
+for index, row in df.iterrows():
+    article_url = row['link']
+    article_content = fetch_article_content(article_url)
+
+    if article_content:
+        # 요약
+        summary = summarize_text(article_content)
+        df.at[index, 'summary'] = summary
+
+        # 키워드 추출
+        keywords = extract_keywords(article_content)
+        df.at[index, 'keywords'] = ', '.join(keywords)
+
+        # 감정 분석
+        sentiment = analyze_sentiment(article_content)
+        df.at[index, 'sentiment'] = sentiment
+
+# 결과를 CSV 파일로 저장
+output_file_path = '/content/processed_articles.csv'
+df.to_csv(output_file_path, index=False, encoding='utf-8-sig')
+
+print(f'Processed data saved to {output_file_path}')
+
+current_time = datetime.now().strftime('%Y%m%d_%H%M%S')
+excel_file_name = f'word_counts_sentiments_{current_time}.xlsx'
+df.to_excel(excel_file_name)
+print(f'DataFrame saved to {excel_file_name}')
+```
+
