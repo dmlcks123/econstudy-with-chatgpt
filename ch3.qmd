@@ -462,7 +462,7 @@ import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 
 # 작업 폴더 내 NanumGothic.ttf 폰트를 등록하고 설정
-font_path = 'NanumGothic.ttf'
+font_path = 'data/NanumGothic.ttf'
 fontprop = fm.FontProperties(fname=font_path)
 
 # 폰트를 추가

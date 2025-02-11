@@ -3,11 +3,16 @@ title: "Ch6. 텍스트마이닝 활용하여 경제 데이터분석"
 Author: "Euichan hwang"
 date: "2025-02-05"
 version: v3
-format: docx
+format:
+  docx:
     toc: false
     number-sections: true
     highlight-style: pygments
-    reference-doc: index.docx    
+    reference-doc: index.docx
+  html:
+    toc: false
+    number-sections: true
+    highlight-style: pygments   
 ---
 
 # 학습목표{.unnumbered}
@@ -44,7 +49,12 @@ format: docx
 
 - 편의를 위해 텍스트를 정제하는 함수를 생성하고 함수의 기능에 특수문자, 숫자, 영문을 제거하는 기능을 포함한다. 텍스트 원문 데이터가 함수를 통해 정제되며 구현방식은 re의 sub()을 활용하여 특정 텍스트를 찾아내고 ""와 같이 공란으로 특정 텍스트를 대체하는 방식으로 진행된다. 예제에서는 영문자를 소문자로 바꾸고 영문을 제거하고 특수문자 및 숫자를 제거하는 방식으로 전처리가 진행된다.
 
-```python
+```{python}
+import pandas as pd
+text_data = pd.read_csv("data/text_mining_sample.txt")
+```
+
+```{python}
 import re
 
 # 텍스트 정제 함수
@@ -56,7 +66,8 @@ def clean_text(text):
     return text
 
 # 실습 파일을 활용한 데이터 정제
-cleaned_data = [clean_text(line) for line in text_data]
+cleaned_data = [clean_text(line) for line 
+in text_data]
 print(cleaned_data[:5])
 ```
 <br>
@@ -125,6 +136,12 @@ print(cleaned_data[:5])
 <br>
 
 - 단어 단위 토큰화
+<br>
+
+```{python}
+!pip install nltk
+```
+
 ```{python}
 # 단어 단위 토큰화
 import nltk
@@ -139,7 +156,7 @@ print(tokenized_text[:5])
 ```
 
 ```{python}
-!pip install konlpy
+pip install konlpy
 ```
 <br>
 
@@ -307,6 +324,10 @@ print(X_tfidf.toarray())
 
 - textblob 
 ```{python}
+pip install textblob
+```
+
+```{python}
 # TextBlob 라이브러리 불러오기 (텍스트 감성 분석을 위한 라이브러리)
 from textblob import TextBlob
 
@@ -332,7 +353,12 @@ from soynlp.normalizer import emoticon_normalize
 from soynlp.word import WordExtractor
 import pandas as pd
 
+with open('data/text_mining_sample.txt', 'r', encoding='utf-8') as f:
+    text_data = f.read().splitlines()  # 혹은 f.readlines()
+
 df = pd.DataFrame({'text': text_data})
+
+# 읽은 결과 확인
 
 # 감성 분석을 위한 간단한 스코어링 함수
 def simple_sentiment(text):
@@ -352,6 +378,9 @@ print(df)
 ### PyKoSpacing을 이용한 띄어쓰기 교정
 - 토큰화를 통하여 텍스트 분석을 수행해야하는데 텍스트 문서에 띄어쓰기 안되어 있는 경우가 있다. 예를 들면 인터넷 댓글 같은 경우 사전이나 뉴스와 같이 엄격한 띄어쓰기를 사용하지 않아 토큰화의 어려움이 있을 수 있다. 이를 위해 pykospacing 라이브러리를 활용하여 텍스트 문서의 띄어쓰기를 임의로 수행할 수 있다.
 <br>
+```{python}
+!pip install pykospacing
+```
 
 ```{python}
 from pykospacing import Spacing
@@ -416,7 +445,7 @@ plt.show()
 !pip install konlpy wordcloud
 ```
 
-```{python}
+```python
 # 워드클라우드 생성 라이브러리 불러오기
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
