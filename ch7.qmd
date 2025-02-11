@@ -3,8 +3,7 @@ title: "Ch7. 머신러닝 활용하여 경제 데이터분석"
 date: "2025-02-02"
 version: "1.1"
 author: "Taewoo Kim"
-format:
-  docx:
+format: docx
     toc: false
     number-sections: true
     highlight-style: pygments
@@ -178,19 +177,19 @@ from sklearn.linear_model import LinearRegression, Ridge, Lasso
 
 from sklearn.preprocessing import PolynomialFeatures
 
-- 고정된 랜덤 시드 설정
+# 고정된 랜덤 시드 설정
 
 np.random.seed(42)
 
-- 데이터 생성
+# 데이터 생성
 X1 = np.linspace(0, 100, 100)  # X1의 범위를 크게 설정
 
 X2 = np.sin(X1) + 0.5 * X1 + np.random.normal(0, 10, 100)  # 큰 노이즈 추가
 
-- 종속 변수 생성 (y = 2*X1 + 0.1*X2^2 - 10*X2 + 100 + 큰 노이즈 추가)
+# 종속 변수 생성 (y = 2*X1 + 0.1*X2^2 - 10*X2 + 100 + 큰 노이즈 추가)
 y = 2 * X1 + 0.1 * (X2 ** 2) - 10 * X2 + 100 + np.random.normal(0, 50, 100)
 
-- 데이터프레임으로 정리
+# 데이터프레임으로 정리
 df = pd.DataFrame({'X1': X1, 'X2': X2, 'y': y})
 ```
 
@@ -255,7 +254,7 @@ plt.show()
 
 
 ```{python}
-- 다중선형회귀 모델
+# 다중선형회귀 모델
 
 model_multiple = LinearRegression()
 

@@ -23,45 +23,63 @@ Google Colab(Colaboratory, 콜랩)은 Google에서 제공하는 클라우드 기
 1. 설치 없이 바로 사용 가능
 - 웹 브라우저에서 바로 실행되므로 별도 환경 설정이 필요 없음.
 - Google 계정만 있으면 무료로 사용 가능.
+
 <br>
+
 2. Google 드라이브와 연동
 - 코드를 작성하고 실행한 후 Google Drive에 저장 가능.
 - CSV, JSON, TXT 파일 등을 쉽게 업로드하여 사용할 수 있음.
+
 <br>
+
 3. 무료 GPU 및 TPU 지원
 - 제한적이지만 무료 GPU(Tesla T4, P100 등)와 TPU 사용 가능.
 - 고성능 컴퓨팅이 필요한 딥러닝 모델 학습에 유용.
+
 <br>
+
 4. Python 및 다양한 라이브러리 내장
 - Numpy, Pandas, Matplotlib, TensorFlow, PyTorch 등 기본 라이브러리 사전 설치됨.
 - !pip install 명령어로 추가 패키지 설치 가능.
+
 <br>
+
 5. Jupyter Notebook과 유사한 인터페이스
 - 코드 및 마크다운(Markdown)을 함께 작성 가능.
 - 시각화 및 대화형 데이터 분석에 최적화.
+
 <br>
+
 6. 협업 기능 지원
 - Google 문서처럼 여러 사람이 동시에 작업 가능.
 - 실시간으로 코드 실행 결과 공유 가능.
+
 <br>
 
 ::: {#fig-graphs}
 ![colab 실행화면](images/colab.png)
 :::
+
 <br>
 
 # colab에 파일 업로드하기
 - 아래 코드와 같이 업로드 창을 띄우고 로컬 폴더의 파일을 직접 선택하여 colab에 올릴 수 있다.
 
+<br>
+
 ```{python}
-from google.colab import files
+#from google.colab import files
 
 # 파일 업로드
-uploaded = files.upload()
+#uploaded = files.upload()
 ```
+
 <br>
 
 - 아래 그림처럼 파일선택 버튼을 누르고 업로드할 파일을 선택한다.
+
+<br>
+
 ::: {#fig-graphs}
 ![colab 실행화면](images/colab2.png)
 :::
@@ -72,9 +90,11 @@ uploaded = files.upload()
 - 위의 방법은 임시파일로 저장하는 것이기 때문에 지속적인 작업을 한다면 google drive에 파일을 올려두고 작업하는 것이 안정적이다.
 - 구글 드라이브에 마운트(연결)하는 코드는 아래와 같다.
 
+<br>
+
 ```{python}
-from google.colab import drive
+#from google.colab import drive
 
 # Google Drive 연결
-drive.mount('/content/drive')
+#drive.mount('/content/drive')
 ```

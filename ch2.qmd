@@ -3,8 +3,7 @@ title: "Ch2. numpy and pandas"
 Date: "2025.02.04"
 Author: "euichan hwang"
 version: v2
-format:
-  docx:
+format: docx
     toc: false
     number-sections: true
     highlight-style: pygments
@@ -102,6 +101,7 @@ print(not g)  # False
 <br>
 
 - 데이터의 구조는 리스트 구조, 튜플 구조, 세트 구조, 딕셔너리 구조로 나눌 수 있으며 그 외에 스택 구조, 큐 구조가 있다. 그러나 numpy 배열이나 pandas 데이터프레임을 주로 활용한다. 인덱싱을 시행할 때 0부터 시작한다는 것을 기억하자.
+<br>
 
 ::: {.callout-note title="ChatGPT에 질문하기"}
 1. 리스트와 튜플의 차이는 무엇이며 용도에 따라 언제 활용해?
@@ -110,12 +110,10 @@ print(not g)  # False
 :::
 <br>
 
-
-<br>
-
 - 리스트(List) : 리스트는 다양한 데이터 타입을 포함할 수 있으며, 인덱스를 통해 개별 요소에 접근할 수 있습니다.
 
 - 리스트는 편집에 용이하며 튜플은 수정이 불가능하다. 따라서 튜를은 데이터 무결성을 보장해야하는 DB를 관리할때 사용하는 것이 좋다.
+
 <br>
 
 ```python
@@ -232,6 +230,7 @@ print(student_info["Alice"]["grades"])  # 출력: [85, 92, 88]
 <br>
 
 - 데이터를 불러오고 확인하는 작업은 데이터 분석에 있어 기초가 되는 일이며 가장 중요한 일이기도 하다. 다양한 형식의 데이터를 불러오는 방법에 대해 설명한다. csv파일(콤마 구분자, 탭 구분자, 세미콜론 구분자), excel파일, 텍스트 파일 불러오는 실습 데이터를 Chatgpt를 통해 생성하였다.
+
 <br>
 
 ::: {.callout-note title="ChatGPT에 질문하기"}
@@ -240,8 +239,10 @@ python 데이터 종류별로 데이터 불러오기에 대해서 간단하게 �
 <br>
 
 ### csv 파일 불러오기
+<br>
 
 - 콤마 구분자
+
 <br>
 
 ```python

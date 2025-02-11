@@ -3,8 +3,7 @@ title: "Ch6. 텍스트마이닝 활용하여 경제 데이터분석"
 Author: "Euichan hwang"
 date: "2025-02-05"
 version: v3
-format:
-  docx:
+format: docx
     toc: false
     number-sections: true
     highlight-style: pygments
