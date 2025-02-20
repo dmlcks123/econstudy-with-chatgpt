@@ -1,0 +1,682 @@
+---
+title: "Ch4. OpenAPI를 이용한 데이터 수집과 경제분석(EDA)"
+version: "1.1"
+numbered: true
+---
+
+# 학습목표 {.unnumbered}
+- OpenAPI에 대한 이해
+- OpenAPI를 이용한 경제 데이터 수집 및 분석
+<br>
+
+# 세부 학습 내용  {.unnumbered}
+ 1. OpenAPI에 대한 이해
+ 2. 통계청 OpenAPI를 이용한 데이터 수집 및 분석
+ 3. OECD OpenAPI를 이용한 데이터 수집 및 분석
+ 4. 공공데이터포털을 이용한 데이터 수집 및 분석
+ 5. 연습문제
+<br>
+
+# OpenAPI
+<br>
+
+## OpenAPI란?
+- OpenAPI 데이터를 제공하기 위해 미리 설계된 API를 호출 시 어떤 데이터를 요청해야 하고, 어떤 응답을 받을 수 있는지 알려주는 문서로 API에 대한 일종의 가이드북이다.
+- 구체적으로는 [KOSIS 공유서비스](https://kosis.kr/openapi/devGuide/devGuide_0201List.do)는 국가통계포털에서 제공하는 통계자료(통계표)에 대한 OpenAPI를 호출 시 어떤 변수(요청변수)를 통해 호출이 가능하고, 호출 결과는 어떤 변수(출력변수)에 담겨 있는지를 설명하고 있다.
+- OpenAPI의 요청변수와 출력변수는 OpenAPI를 제공하는 기관과 자료의 형태에 따라 다른데, 사용방법에 대한 구체적인 설명을 별도로 제공하고 있으니 OpenAPI를 사용하기 전 해당 정보를 확인하는 것이 중요하다.
+
+## 왜 OpenAPI 인가?
+- 전통적으로 데이터는 엑셀 혹은 CSV 등 형태로 다운로드를 받아  통계패키지 혹은 파이썬 등에 불러오는 방식이 일반적이었다. OpenAPI는 오래전 부터 사용되어 왔지만, 데이터를 OpenAPI를 호출하는 방식으로 확보하기에는 프로그래밍에 대한 지식이 추가로 필요했다. 최근 생성형 AI가 발전하면서 코딩에 대한 부담이 매우 낮아져 OpenAPI를 이용한 데이터 확보가 각광받고 있다.
+- OpenAPI를 이용하면 주기적으로 업데이트되는 데이터를 매번 다운로드 받을 필요 없이 자동화 된 기능을 이용해 업데이트 주기에 맞춰 데이터를 자동으로 다운 받고 분석 결과를 업데이트 할 수 있다.
+- 또한 데이터를 받을 때 큰 덩어리로 받을 필요 없이 요청변수를 조합해 내가 원하는 데이터만 미리 필터링 해서 받아 사용하는 것도 가능하다.
+- 마지막으로 최근 OpenAPI를 이용해 공공데이터를 개방하는 형태가 많아지고 있어 데이터를 분석하는 연구자라면 반드시 익혀야 할 필요성이 있다.
+
+# 국가통계포털 OpenAPI를 이용한 데이터 수집과 분석
+## 국가통계포털 OpenAPI 사용 준비
+- 다수의 OpenAPI는 사용자에게 고유의 APIkey를 제공하고 이 키를 이용해 OpenAPI를 호출해야 한다. 이를 위해 아래의 절차에 따라 APIkey를 확보하자.
+
+1. [국가통계포털](https://kosis.kr/)에 접속 후 회원가입을 하자.
+2. [KOSIS 공유서비스](https://kosis.kr/openapi/)로 이동 후 상단의 `활용신청`으로 이동해 OpenAPI에 사용할 APIkey를 신청하자.
+
+## 국가통계포털 OpenAPI를 이용한 데이터 수집
+- APIkey를 발급받았다면 OpenAPI를 이용해 데이터를 수집할 준비가 되었다. 여기서는 시도별 소비자물가지수를 선택해 분석을 진행한다. 아래 절차에 따라 데이터를 수집하자.
+
+1. [국가통계포털](https://kosis.kr/)로 이동 후 로그인하지 않았다면 우선 로그인을 하고 로그인을 했다면, 통합검색에 소비자물가지수를 입력 후 검색 버튼을 클릭하자.
+2. 중간에 위치한 통계표 중 소비자물가지수(시도)를 클릭하면 최근 6개월 간 시도별 소비자물가지수가 제시된다.
+3. 우측 상단 메뉴 중 OPENAPI를 클릭하면 OpenAPI를 호출 하는데 필요한 설정이 나타나고, 아래쪽으로 스크롤을 내리면 URL생성이라는 버튼이 있다.
+    - 이때 로그인을 했다면 "사용자 인증키"에 개인 key가 입력되어 있다.
+4. 조회시점을 월에서 년으로 하고, 최근 5개 자료로 변경 후 URL생성 버튼을 클릭하면 APIkey가 포함된 URL이 생성 및 복사된다.
+5. 생성 및 복사된 URL을 웹브라우저 주소창에 입력 후 해당 주소로 이동해 보자.
+    - 매우 복잡한 형태의 문자가 나열되어 있는데, 이 내용이 우리가 조회한 소비자물가지수(시도)별 5년치 데이터에 해당한다.
+
+## ChatGPT를 이용한 데이터 호출 및 정리
+- 이렇게 확보한 데이터를 다시 우리가 사용할 Dataframe 형태로 정리하는 것은 별도의 일이다. 과거 생성형 AI가 발달하기 전에는 OpenAPI를 호출하고, Dataframe으로 만들기 위해 프로그래밍 언어를 별도로 배워야 했으나, 지금은 ChatGPT에 몇 가지 정보만 입력하면 사용 가능한 코드를 바로 작성해 준다.
+- 아래의 절차에 따라 코드를 얻는 연습을 해 보자.
+    1. 호출한 데이터 변수에 대한 정보를 먼저 ChatGPT에게 알려주기 위해 [KOSIS 공유서비스 - 통계자료](https://kosis.kr/openapi/devGuide/devGuide_0201List.do)로 이동하자.
+    2. 스크롤을 내려 "통계표선택 방법 - 출력결과" 부분의 내용을 드래그 후 복사하자.
+    3. ChatGPT와의 대화 창에 복사한 내용을 붙여넣고, 기억해 달라고 요청하자.
+        - 붙여넣은 내용과 함께 "내용을 기억해줘"와 같은 요청을 하면 해당 내용을 기억했다고 답한다.
+    4. 소비자물가지수(시도)에서 확보한 URL에 접근해 얻은 내용을 복사후 ChatGPT에 붙여넣고 다음과 같은 주문을 하자.
+        - 이 때 호출한 URL을 같이 넣고 알려주면 더 좋다. 아래는 프롬프트 예시이다.
+        - 위 내용은 다음 URL을 호출한 결과야, 제시한 URL을 호출하고, 호출 내용을 로컬에서 파이썬을 이용해 Datafame으로 정리하는 코드를 제시하되, 미리 알려준 출력결과를 참고해 변수명을 만들어줘.
+
+- 아래는 ChatGPT가 제시한 Python 코드 예시이다.
+
+
+```{python}
+#| eval: false
+import requests
+import pandas as pd
+
+# URL 및 API 호출
+url = "https://kosis.kr/openapi/Param/statisticsParameterData.do"
+params = {
+    "method": "getList",
+    "apiKey": "개인 APIkey",
+    "itmId": "T+",
+    "objL1": "ALL",
+    "format": "json",
+    "jsonVD": "Y",
+    "prdSe": "Y",
+    "newEstPrdCnt": 5,
+    "orgId": "101",
+    "tblId": "INH_1J22003"
+}
+
+response = requests.get(url, params=params)
+data = response.json()
+
+# 데이터프레임 생성
+df = pd.DataFrame(data)
+
+# 컬럼명 변경: KOSIS 출력 변수명 기준 적용
+df.rename(columns={
+    "ORG_ID": "기관코드",
+    "TBL_ID": "통계표ID",
+    "TBL_NM": "통계표명",
+    "C1": "분류값_ID1",
+    "C1_OBJ_NM": "분류명1",
+    "C1_OBJ_NM_ENG": "분류명1_영문",
+    "C1_NM": "분류값명1",
+    "C1_NM_ENG": "분류값명1_영문",
+    "ITM_ID": "항목_ID",
+    "ITM_NM": "항목명",
+    "ITM_NM_ENG": "항목명_영문",
+    "UNIT_ID": "단위_ID",
+    "UNIT_NM": "단위명",
+    "UNIT_NM_ENG": "단위명_영문",
+    "PRD_SE": "수록주기",
+    "PRD_DE": "수록시점",
+    "DT": "수치값",
+    "LST_CHN_DE": "최종수정일"
+}, inplace=True)
+
+# 데이터프레임 확인
+df.head()
+```
+
+```{python}
+#| echo: false
+import requests
+import pandas as pd
+
+# URL 및 API 호출
+url = "https://kosis.kr/openapi/Param/statisticsParameterData.do"
+params = {
+    "method": "getList",
+    "apiKey": "ZDE3ZTViNDMwNGJmZDU4YzgyMjE2Nzk2ZTIyNjcwMGY=",
+    "itmId": "T+",
+    "objL1": "ALL",
+    "format": "json",
+    "jsonVD": "Y",
+    "prdSe": "Y",
+    "newEstPrdCnt": 5,
+    "orgId": "101",
+    "tblId": "INH_1J22003"
+}
+
+response = requests.get(url, params=params)
+data = response.json()
+
+# 데이터프레임 생성
+df = pd.DataFrame(data)
+
+# 컬럼명 변경: KOSIS 출력 변수명 기준 적용
+df.rename(columns={
+    "ORG_ID": "기관코드",
+    "TBL_ID": "통계표ID",
+    "TBL_NM": "통계표명",
+    "C1": "분류값_ID1",
+    "C1_OBJ_NM": "분류명1",
+    "C1_OBJ_NM_ENG": "분류명1_영문",
+    "C1_NM": "분류값명1",
+    "C1_NM_ENG": "분류값명1_영문",
+    "ITM_ID": "항목_ID",
+    "ITM_NM": "항목명",
+    "ITM_NM_ENG": "항목명_영문",
+    "UNIT_ID": "단위_ID",
+    "UNIT_NM": "단위명",
+    "UNIT_NM_ENG": "단위명_영문",
+    "PRD_SE": "수록주기",
+    "PRD_DE": "수록시점",
+    "DT": "수치값",
+    "LST_CHN_DE": "최종수정일"
+}, inplace=True)
+
+# 데이터프레임 확인
+df.head()
+```
+
+::: {.callout-tip}
+ChatGPT는 내부에서 Python을 이용해 직접 분석을 수행하고 결과를 제공할 수 있다. 로컬에서 실행할 코드를 달라는 직접적인 주문을 하지 않는 경우 자체적으로 Python을 이용해 분석결과를 내놓기도 한다. 따라서 로컬에서 실행할 코드를 원하는 경우 로컬에서 실행한다는 것을 명시적으로 알려주는 것을 권장한다.
+:::
+<br>
+
+## 소비자물가지수 분석
+- 확보한 데이터를 간단히 분석해 보자. 아래와 같이 데이터를 정리하자.
+    1. 수집한 데이터 중 필요한 변수만 포함한 Dataframe을 생성
+    2. 시도별 비교에 필요치 않은 `전국` 항목은 삭제
+
+```{python}
+df_filtered = df.loc[df['분류값명1'] != '전국', ['수록시점', '수치값', '분류값명1']]
+
+df_filtered.head()
+```
+
+- 가벼워진 데이터프레임의 기초통계를 보자. 17개 광역시도의 5년치 데이터이고, 85개가 수집되었으므로 데이터 중 결측은 없다.
+
+```{python}
+df_filtered.describe()
+```
+
+- 기초통계로 많이 사용하는 평균, 표준편차 등이 나타나지 않는 것을 알 수 있다. 이는 OpenAPI를 통해 수집한 데이터의 형태가 숫자형이 아닌 문자형으로 수집되었기 때문이다. 아래 명령어를 이용해 현재 데이터 형태를 살펴보자.
+
+```{python}
+df_filtered.dtypes
+```
+
+- 우리가 사용할 데이터 중 숫자인 `수치값`이 숫자형 변수인 `int` 혹은 `float`가 아닌 `object`임을 확인 할 수 있다. 따라서 `수치값`을 숫자로 우선 변경하자.
+```{python}
+# '수치값'을 숫자로 변환
+df_filtered['수치값'] = pd.to_numeric(df_filtered['수치값'], errors='coerce')  # 변환 불가능한 값은 NaN 처리
+```
+
+- 다시 기초통계를 확인하면, 평균과 표준편차 등 익숙한 형태의 데이터가 나타난다.
+
+```{python}
+df_filtered.describe()
+```
+
+- 본격적으로 그래프를 이용해 각 시도별 소비자물가지수를 비교하기 전에 명확하지 않은 컬럼명 `분류값명`을 `지역`으로 변경하자
+
+```{python}
+df_filtered.rename(columns={'분류값명1': '지역'}, inplace=True)
+```
+
+- 이번에는 박스플롯 그래프를 이용해 각 시도별 소비자물가지수를 비교해 보자.
+
+```{python}
+#| eval: false
+import matplotlib.pyplot as plt
+import seaborn as sns
+import koreanize_matplotlib
+
+# Boxplot 그리기
+plt.figure(figsize=(6, 4))  # 그래프 크기를 가로 10, 세로 6으로 설정
+sns.boxplot(
+    x='지역',            # x축에 '지역' 열을 기준으로 그룹화
+    y='수치값',          # y축에 '수치값' 열을 기준으로 박스플롯 생성
+    data=df_filtered    # df_filtered 데이터프레임을 사용하여 플롯 생성
+)
+plt.title('지역별 소비자물가지수')  # 그래프 제목 설정
+plt.xlabel('지역')             # x축 레이블을 '지역'으로 설정
+plt.ylabel('수치값')           # y축 레이블을 '수치값'으로 설정
+plt.xticks(rotation=45)        # x축 레이블을 45도 회전하여 가독성 확보
+plt.tight_layout()             # 그래프 레이아웃을 자동으로 조정하여 보기 좋게 설정
+plt.show()                     # 그래프를 화면에 출력
+```
+
+- 위에 제시된 코드를 이용해 그래프를 그리면, 잘 그려진 그래프라는 인상을 받기는 어렵다. 이런 경우 사용자가 ChatGPT에 어떤 부분을 어떻게 고쳐달라고 요청하거나, 그래프를 복사해 ChatGPT에게 입력 후 개선된 코드를 요청하는 방법이 있다. 아래는 몇 차례 개선을 거쳐 ChatGPT를 통해 얻은 개선된 그래프이다.
+
+```{python}
+import matplotlib.pyplot as plt
+import seaborn as sns
+import koreanize_matplotlib
+
+# 사용자 지정 최소/최대 y축 값 (None이면 자동 설정)
+y_min = 95  # 예: 1000 (사용자가 원하는 값 입력)
+y_max = 120  # 예: 50000 (사용자가 원하는 값 입력)
+
+# y_min, y_max가 None이면 데이터 기반으로 설정
+if y_min is None:
+    y_min = df_filtered['수치값'].min() * 0.9  # 최소값보다 10% 낮게 설정
+if y_max is None:
+    y_max = df_filtered['수치값'].max() * 1.1  # 최대값보다 10% 높게 설정
+
+# 그래프 크기 설정
+plt.figure(figsize=(12, 6))  # 가로를 늘려 가독성 개선
+
+# 박스플롯 그리기
+sns.boxplot(
+    x='지역',            # x축을 '지역'으로 설정하여 그룹화
+    y='수치값',          # y축을 '수치값'으로 설정하여 박스플롯 생성
+    data=df_filtered,   # df_filtered 데이터 사용
+    hue='지역',         # 각 지역을 색상별로 구분
+    palette="Set2",     # 색상을 부드럽게 설정하여 가독성 향상
+    legend=False        # 범례 제거 (hue를 사용하면 자동으로 범례가 생기므로 제거)
+)
+
+# 그래프 제목 및 라벨 설정
+plt.title('지역별 소비자물가지수', fontsize=14)  # 제목 폰트 크기 확대
+plt.xlabel('지역', fontsize=12)              # x축 레이블 폰트 크기 확대
+plt.ylabel('수치값', fontsize=12)            # y축 레이블 폰트 크기 확대
+
+# x축 레이블 가독성 개선
+plt.xticks(rotation=90)  # x축 라벨을 90도로 회전하여 겹침 방지
+
+# y축 범위 설정
+plt.ylim(y_min, y_max)
+
+# 레이아웃 조정
+plt.tight_layout()
+
+# 그래프 출력
+plt.show()
+
+```
+
+- 이번에는 이 그래프에 대한 분석도 ChatGPt에게 의뢰해 보자. 아래는 ChatGPT의 답변 중 일부이다.
+    - 중앙값(Median)
+        - 대부분의 지역에서 중앙값(검은 가로선)이 비슷한 수준을 유지하고 있음. 
+        - 이는 지역 간 데이터의 중심 경향이 크게 차이나지 않음을 의미.
+    - 변동성(Interquartile Range, IQR)
+        - 일부 지역(예: 부산광역시, 충청북도 등)의 박스 크기가 상대적으로 큰 편 → 변동성이 약간 높은 편
+    - 최댓값/최솟값
+        - 모든 지역에서 최댓값과 최솟값이 비슷한 범위에 위치. 특정 지역만 극단적으로 크거나 작은 값이 존재하지 않음 → 전체적으로 비슷한 데이터 스케일을 갖고 있음.
+    - 이상치(Outliers)
+        - 현재 박스플롯에는 이상치(outliers)가 표시되지 않았음.
+        - 만약 이상치를 확인하고 싶다면 showfliers=True 옵션을 추가하여 다시 확인 필요.
+
+- 위 분석결과처럼 간략한 분석 내용과 더불어 추가 옵션을 활용해야 하는 경우까지 제안해 주고 있다.
+
+::: {.callout-tip}
+ChatGPT가 제시한 Python 코드를 실행하면, 잘 작동하지만 경고 메시지가 나타나는 경우가 있다. 예를 들며 "Passing palette without assigning hue is deprecated and will be removed in v0.14.0. Assign the x variable to hue and set legend=False for the same effect.
+"와 같은데, 이런 메시지는 주로 특정 패키지가 향후 업데이트 되는 경우 현재 코드가 작동하지 않을 가능성이 있을 때 나타난다. 이러한 경우 경고메세지를 다시 ChatGPT에 넣으면, 이 부분을 반영해 경고가 나타나지 않는 코드로 수정해준다.
+:::
+<br>
+
+# OECD OpenAPI를 이용한 국제 데이터 수집과 분석
+- 앞서 국내 통계를 이용해 간략한 데이터 분석을 수행하는 과정을 경험했다면, 이번에는 국제통계를 이용한 국가간 비교 과정을 ChatGPT와 함께 경험해보자.
+- [OECD Data Explorer](https://data-explorer.oecd.org/)로 접속 후 `Average annual wages`를 검색하자. 가장 상단의 검색 결과를 클릭하면, 해당 통계에 대한 간략한 설명이 나타난다. 이 설명을 ChatGPT에 붙여넣고, 설명해달라고 요청하면 한글로 정리된 내용을 답변해 준다. 다음은 ChatGPT가 답변한 내용 중 일부이다.
+    - 데이터 개요: 평균 연간 임금은 국민계정(National Accounts) 기반의 총 임금 총액(Total Wage Bill)을 전체 경제의 평균 근로자 수로 나누어 계산됩니다.
+    - 데이터 단위: 현재 가격, 2022년 기준 불변 가격(국가통화), 2022년 기준 구매력평가(미국 달러), 2022년 기준 불변 가격(미국 달러, PPP 기준)
+    - 데이터의 활용: 국가별 평균 임금 비교, 경제 성장에 따른 임금 변동 분석
+- `Table`을 클릭하면, 우리에게 익숙한 스프레드시트 형태의 데이터를 보여준다. 표를 자세히 보면 바로 위에서 ChatGPT가 설명해준 내용이 포함되어 있음을 알 수 있다. 오른쪽으로 이동해서 `Development API`를 클릭하면 API를 호출 할 수 있는 링크를 직접 제공한다. 특히 OECD의 경우 개인용 APIkey를 별도로 요구하지 않아 제시된 URL만으로 데이터 수집이 가능하다.
+    - 이 때 생성된 URL은 아래 표에 제시된 데이터를 그대로 담고 있다. 다시 말해 우리가 궁금하지 않은 데이터도 담고 있다는 말이다.
+    - 여기서 크게 두 가지 방법이 있는데, 한 가지는 보이는 그대로 데이터를 수집한 뒤 데이터를 정제하거나, 왼쪽에 보이는 필터를 설정 후 데이터를 수집하는 방법이 이 있다. 일반적인 경우 우리가 원하는 종류의 데이터와 기간이 있으므로 여기서는 우선 필터를 적용하는 방법을 활용한다.
+- 다음과 같이 필터를 설정해 보자.
+    1. 기간인 `Time period`는 `Last`에 10을 입력해 10년 간 데이터로 조정하자.
+    2. 참고 지역은 간략한 분석을 위해 한국, 미국, 일본, OECD를 선택하자.
+    3. 단위 `Unit of measure`는 국제비교를 위해 `US dollar, PPP converted`를 선택하자.
+    4. 기준가격은 실질가격으로 비교하기 위해 `Constant prices`를 선택하자.
+- 
+
+- 필터를 선택하면, 선택할 때 마다 API를 호출할 수 있는 주소가 변경된다. API 호출 시 제공되는 데이터 형태에 따라 3가지 URL이 제시되는데 어느 것을 선택해도 상관 없다. 왜냐하면 우리가 직접 코드를 작성하는 것이 아니라 ChatGPT에게 맡길 것이기 떄문이다. 여기서는 기본적으로 노출되는 `SDMX Flavour - Flat`를 선택한다. 세 가지 데이터 형태의 차이는 아래 표를 참조하면 된다.
+
+| Query 유형 | 설명 | 데이터 구조 | 활용 목적 |
+|------------|------|-------------|-----------|
+| **SDMX Flavour - Flat** | 평면 구조 데이터 | 행(Row) 중심 정렬 | 엑셀 분석, 테이블 데이터 활용 |
+| **SDMX Flavour - Time Series** | 시계열 데이터 | 열(Column) 중심 정렬 | 시계열 분석, 성장률 분석 |
+| **Structure Query** | 데이터 구조 조회 | 메타데이터 | 데이터 쿼리 준비, 데이터셋 확인 |
+
+
+::: {.callout-tip}
+ChatGPT에 API 호출 내용을 붙여넣고 파이썬 코드를 요청할 때 붙여넣은 내용이 너무 긴 경우가 있다. 이 경우 ChatGPT가 내용이 너무 길다며 오류 메시지를 답하는 경우가 있는데, 이 경우 호출 내용을 간략히 하면 해결 가능하다. 대표적인 방법은 조회 기간을 단축하는 것이다. 예컨대 10년치 데이터를 호출했다면, 3년치만 호출하고 실제 파이썬에 코드를 실행할 때 API 파라미터의 값을 10년으로 변경하는 것이다.
+:::
+<br>
+
+## Average annual wages 분석
+- 여기서 부터는 국가통계포털 데이터를 수집 및 분석했을 떄와 유사하다. 우선 확보한 URL에 접속 후 화면에 나타난 데이터를 복사해 ChatGPT에 붙여넣고 아래와 같은 요청을 더하자.
+    - *url "OECD에서 제공하는 URL"을 호출한 결과가 아래와 같아 로컬에서 python을 이용해 데이터프레임으로 만들고 싶으니 코드를 제시해줘*
+
+```{python}
+import requests
+import xml.etree.ElementTree as ET
+import pandas as pd
+
+# 요청할 URL
+url = "https://sdmx.oecd.org/public/rest/data/OECD.ELS.SAE,DSD_EARNINGS@AV_AN_WAGE,1.0/OECD+USA+KOR+JPN..USD_PPP..Q..?startPeriod=2019&dimensionAtObservation=AllDimensions"
+
+# XML 데이터 가져오기
+response = requests.get(url)
+response.raise_for_status()  # 오류 발생 시 예외 처리
+
+# XML 파싱
+root = ET.fromstring(response.text)
+
+# 네임스페이스 정의
+ns = {
+    'generic': 'http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/generic'
+}
+
+# 데이터 추출
+data = []
+for obs in root.findall(".//generic:Obs", ns):
+    # 키 값 추출
+    obs_key = obs.find("generic:ObsKey", ns)
+    record = {val.get('id'): val.get('value') for val in obs_key.findall("generic:Value", ns)}
+    
+    # 수치 값 추출
+    obs_value = obs.find("generic:ObsValue", ns)
+    record['VALUE'] = obs_value.get('value') if obs_value is not None else None
+
+    data.append(record)
+
+# 데이터프레임 생성
+df_oecd = pd.DataFrame(data)
+df_oecd.head()
+```
+
+- 우선 확보한 데이터를 이용해 각 국가별 기초통계를 보자.
+
+```{python}
+df_oecd.groupby("REF_AREA")["VALUE"].describe()
+```
+
+- 국가통계포털의 경우와 마찬가지로 다소 낯선 기초통계가 출력된다. 데이터 타입을 확인해 보면, 모든 변수가 `object`로 나타난다. 이 중 값에 해당하는 `VALUE`를 숫자형으로 변경 후 다시 기초통계를 확인해 보자.
+    - 추가로 숫자에 해당하는 연도 값도 `object`에서 숫자형으로 변경하자.
+```{python}
+df_oecd.dtypes
+```
+
+```{python}
+df_oecd["VALUE"] = df_oecd["VALUE"].astype(float)
+df_oecd["TIME_PERIOD"] = df_oecd["TIME_PERIOD"].astype(float)
+df_oecd.describe()
+```
+
+- 여기서도 ChatGPT를 활용 가능한데, 데이터 수집 이후 데이터 타입을 변경했다는 내용과 함께 어떤 그래프로 분석하는 것이 좋은지 제안해 달라고 요청하면 기존에 ChatGPT와 나눈 대화에 기반해 여러 그래프를 제안해 준다. 아래는 ChatGPT가 제안한 내용 중 일부이다.
+    - 시간 흐름을 보고 싶다면: 선 그래프
+    - 국가 간 비교를 하고 싶다면: 막대 그래프
+    - 증가율을 비교하고 싶다면: 꺾은선 그래프
+    - 분포를 보고 싶다면: 히스토그램 또는 박스 플롯
+- 물론 이렇게 ChatGPT가 제안한 그래프가 정답은 아닐 수 있으나, 아이디어를 얻는 차원에서는 좋은 접근이라 생각한다.
+
+- 우선 국가별 시계열 그래프를 그려보자. 
+    - 여기서는 ChatGPT에게 "국가별 시계열 그래프를 그리는 코드를 제시해줘"라고 요청하였다.
+    - 추가로 각 축의 단위를 비롯한 사용자가 나타내고자 하는 그래프 특성을 추가로 요청하면 해당 내용을 명시적으로 반영해 준다. 예를들면, X축은 연도를 의미하고, Y 축은 천단위마다 콤마를 넣어달라는 요청이 가능하다.
+
+```{python}
+import matplotlib.pyplot as plt
+import seaborn as sns
+import matplotlib.ticker as ticker
+from matplotlib.ticker import MultipleLocator
+
+# 데이터 준비: 숫자형 변환이 완료된 데이터프레임 사용
+df_oecd["VALUE"] = df_oecd["VALUE"].astype(float)
+
+# 국가별 시계열 그래프
+plt.figure(figsize=(12, 6))
+sns.lineplot(data=df_oecd, x="TIME_PERIOD", y="VALUE", hue="REF_AREA", marker="o")
+
+# 그래프 설정
+plt.xlabel("Year")
+plt.ylabel("Average Annual Wage (USD_PPP)")
+plt.title("OECD Average Annual Wage Trends by Country")
+plt.legend(title="Country")
+plt.grid(True)
+
+# Y축에 천 단위마다 콤마 추가
+plt.gca().get_yaxis().set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x:,.0f}"))
+
+# X축을 1년 단위로 설정
+plt.gca().xaxis.set_major_locator(MultipleLocator(1))
+
+# 그래프 출력
+plt.show()
+```
+
+- 마찬가지로 이 그래프도 ChatGPT에게 분석을 의뢰할 수 있다. 아래는 답변의 일부이다.
+    - 미국은 가장 높은 임금을 유지하지만, 경기 변동에 따라 큰 영향을 받음.
+    - OECD 평균은 약간의 변동이 있지만, 비교적 안정적인 흐름을 유지.
+    - 한국과 일본의 임금 수준은 미국 및 OECD 평균보다 낮으며, 특히 일본은 가장 낮은 수준을 유지.
+    - 2023년부터 한국과 일본의 임금이 다시 증가하는 흐름이 보이므로, 향후 지속적인 상승이 이루어질지 여부를 추가적으로 분석할 필요가 있음.
+
+- 평균 임금 수준의 변동이 관찰되기는 하나 뚜렷하지 않고, 미국이 다른 경우에 비해 매우 높은 수준으로 직접 비교는 어렵다는 단점이 있다. 이번에는 2021년 이후 증감율을 계산 후 그래프로 나타내 보자.
+- 우선 국가별로 전년대비 증감율을 계산하고, 증감율 계산이 잘 되었는지 확인하자.
+
+```{python}
+# 국가별 연도 정렬 후 전년 대비 증감률 계산
+df_oecd = df_oecd.sort_values(["REF_AREA", "TIME_PERIOD"])
+df_oecd["YOY_CHANGE"] = df_oecd.groupby("REF_AREA")["VALUE"].pct_change() * 100  # 전년 대비 증감률 (%)
+df_oecd[["TIME_PERIOD", "REF_AREA", "VALUE", "YOY_CHANGE"]].head()
+```
+
+```{python}
+import matplotlib.pyplot as plt
+import seaborn as sns
+import matplotlib.ticker as ticker
+from matplotlib.ticker import MultipleLocator
+
+# 국가별 시계열 그래프
+plt.figure(figsize=(12, 6))
+sns.lineplot(data=df_oecd, x="TIME_PERIOD", y="YOY_CHANGE", hue="REF_AREA", marker="o")
+
+# 그래프 설정
+plt.xlabel("Year")
+plt.ylabel("Year-over-Year Change (%)")
+plt.title("Annual Growth Rate of OECD Average Annual Wage by Country")
+plt.legend(title="Country")
+plt.grid(True)
+
+# Y축에 천 단위마다 콤마 추가
+plt.gca().get_yaxis().set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x:,.0f}"))
+
+# X축을 1년 단위로 설정
+plt.gca().xaxis.set_major_locator(MultipleLocator(1))
+
+# 그래프 출력
+plt.show()
+```
+
+- 마찬가지로 그래프를 ChatGPT에게 분석을 의뢰할 수 있고, 해석 중 일부는 아래와 같다.
+    - 대체로 2020년-2021년에는 연봉이 증가하는 경향이 있었음.
+    - 2021년-2022년에는 모든 국가에서 연봉 증가율이 하락했으며, 특히 한국(KOR)과 미국(USA)의 하락 폭이 컸음.
+    - 2022년-2023년에는 다시 반등하는 국가들이 많음, 하지만 일본(JPN)은 추가 하락하여 어려움을 겪었을 가능성이 있음.
+    - 미국(USA)의 경우, 증감률 변동 폭이 가장 큼 → 2020년-2021년 급증했다가 2021년-2022년에 크게 감소한 뒤 2022년-2023년에 다시 회복.
+
+# 두 가지 이상 데이터를 이용한 분석
+- 이제까지 국가통계포털과 OECD에서 제공하는 1가지 자료를 이용한 간단한 분석을 배웠다. 이번에는 통계청에서 제공하는 데이터 중 `실업률`과 `물가상승률`을 이용하여 경제학에서 잘 알려진 필립스 곡선을 그려보자.
+
+## 국가통계포털 OpenAPI를 이용한 두 가지 데이터 수집
+### 실업률 데이터 수집
+- 우선 실업률 데이터를 수집해 보자. 국가통계포털에 접속후 실업률을 검색 후 아래 단계에 따라 통계표를 조정하자.
+    1. 가장 상단에 검색된 `성/교육정도별 실업률`을 클릭 후 통계표를 조정하자
+        - `조회설정`을 클릭 후 `성별`과 `교육정도별`을 모두 `계`만 조회를 클릭하자
+    2. `OPENAPI` 버튼을 클릭 후 `조회기간`을 `년`으로 설정후 `20`을 입력하자.
+    3. `URL생성` 버튼을 클릭하면 URL을 얻을 수 있다.
+
+- API의 URL을 얻었다면 아래의 절차에 따라 실업률 데이터를 Dataframe으로 만들자.
+    1. ChatGPT로 이동해 우선 API를 호출하면 출력되는 변수 정보 기억해 달라고 하자. 변수정보는 [KOSIS 공유서비스](https://kosis.kr/openapi/devGuide/devGuide_0201List.do)에서 확인 가능하다.
+    2. API를 호출할 URL과 호출 후 결과값을 
+
+
+::: {.callout-tip}
+ChatGPT가 파이썬 코드를 작성 후 제시할 때 `import ace_tools as tools`라는 패키지를 불러오고 해당 패키지를 이용하는 코드를 제시하는 경우가 있다. 이 때 `ace_tools` 패키지는 ChatGPT 내부에서만 작동하는 패키지이므로 로컬에서 해당 코드를 실행하면 작동하지 않는다. 이 경우 해당 부분을 삭제하거나 로컬에서 수행 가능한 코드를 제시해 달라고 다시 요청하면 된다.
+:::
+<br>
+
+
+```{python}
+import requests
+import pandas as pd
+
+# API 호출 URL
+url = "https://kosis.kr/openapi/Param/statisticsParameterData.do?method=getList&apiKey=ZDE3ZTViNDMwNGJmZDU4YzgyMjE2Nzk2ZTIyNjcwMGY=&itmId=T80+&objL1=0+&objL2=00+&objL3=&objL4=&objL5=&objL6=&objL7=&objL8=&format=json&jsonVD=Y&prdSe=M&newEstPrdCnt=60&orgId=101&tblId=DT_1DA7103S"
+
+# 데이터 요청
+response = requests.get(url)
+data = response.json()
+
+# 데이터프레임 생성
+df_unemp = pd.DataFrame(data)
+
+# 컬럼명 변경 (출력변수 정보 반영)
+df_unemp.rename(columns={
+    "ORG_ID": "기관코드",
+    "TBL_ID": "통계표ID",
+    "TBL_NM": "통계표명",
+    "C1": "분류값 ID1",
+    "C1_OBJ_NM": "분류명1",
+    "C1_OBJ_NM_ENG": "분류 영문명1",
+    "C1_NM": "분류값 명1",
+    "C1_NM_ENG": "분류값 영문명1",
+    "C2": "분류값 ID2",
+    "C2_OBJ_NM": "분류명2",
+    "C2_OBJ_NM_ENG": "분류 영문명2",
+    "C2_NM": "분류값 명2",
+    "C2_NM_ENG": "분류값 영문명2",
+    "ITM_ID": "항목 ID",
+    "ITM_NM": "항목명",
+    "ITM_NM_ENG": "항목영문명",
+    "UNIT_ID": "단위ID",
+    "UNIT_NM": "단위명",
+    "UNIT_NM_ENG": "단위영문명",
+    "PRD_SE": "수록주기",
+    "PRD_DE": "수록시점",
+    "DT": "수치값",
+    "LST_CHN_DE": "최종수정일"
+}, inplace=True)
+
+# 데이터 확인
+df_unemp.head()
+```
+
+- 우선 API를 호출해 생성한 Dataframe의 각 변수 타입을 살펴보자. 앞선 예제에서 변수의 데이터 타입에 따라 계산이 안되는 경우가 있었음을 기억하자.
+
+```{python}
+df_unemp.dtypes
+```
+
+- 모두 `Object` 형태임을 알았다. 실업률을 담고 있는 변수 `수치값`을 숫자로 변경하고 데이터타입을 다시 확인해보자.
+
+```{python}
+df_unemp["수치값"] = pd.to_numeric(df_unemp["수치값"], errors="coerce")
+
+df_unemp.dtypes
+```
+
+- 이제 `수치값` 변수는 정수형으로 변경되었다.
+
+- 이번에는 국가통계포털에서 `소비자물가지수`를 검색 후 최근 61개월 데이터를 조회할 수 있는 API URL을 확보하자.
+    - 소비자물가지수를 물가상승률로 변경해야 해 60개가 아닌 61개 데이터가 필요하다.
+
+
+```{python}
+import requests
+import pandas as pd
+
+# API 호출 URL
+url = "https://kosis.kr/openapi/Param/statisticsParameterData.do?method=getList&apiKey=ZDE3ZTViNDMwNGJmZDU4YzgyMjE2Nzk2ZTIyNjcwMGY=&itmId=T+&objL1=T10+&objL2=&objL3=&objL4=&objL5=&objL6=&objL7=&objL8=&format=json&jsonVD=Y&prdSe=M&newEstPrdCnt=61&orgId=101&tblId=DT_1J22003"
+
+# 데이터 요청
+response = requests.get(url)
+data = response.json()
+
+# 데이터프레임 생성
+df_cpi = pd.DataFrame(data)
+
+# 컬럼명 변경 (출력변수 정보 반영)
+df_cpi.rename(columns={
+    "ORG_ID": "기관코드",
+    "TBL_ID": "통계표ID",
+    "TBL_NM": "통계표명",
+    "C1": "분류값 ID1",
+    "C1_OBJ_NM": "분류명1",
+    "C1_OBJ_NM_ENG": "분류 영문명1",
+    "C1_NM": "분류값 명1",
+    "C1_NM_ENG": "분류값 영문명1",
+    "C2": "분류값 ID2",
+    "C2_OBJ_NM": "분류명2",
+    "C2_OBJ_NM_ENG": "분류 영문명2",
+    "C2_NM": "분류값 명2",
+    "C2_NM_ENG": "분류값 영문명2",
+    "ITM_ID": "항목 ID",
+    "ITM_NM": "항목명",
+    "ITM_NM_ENG": "항목영문명",
+    "UNIT_ID": "단위ID",
+    "UNIT_NM": "단위명",
+    "UNIT_NM_ENG": "단위영문명",
+    "PRD_SE": "수록주기",
+    "PRD_DE": "수록시점",
+    "DT": "수치값",
+    "LST_CHN_DE": "최종수정일"
+}, inplace=True)
+
+# 데이터 확인
+df_cpi.head()
+```
+
+- 마찬가지로 숫자로 저장되어야 하는 변수의 형태를 확인 후 숫자가 아닌 경우 숫자형으로 변경하자.
+- 확인결과 모두 타입이 `object`로 구성되어 있다. 이 경우 연산이 안되는 경우가 있으니, `수치값` 변수는 숫자로 변경하고 물가상승률을 계산하자.
+
+```{python}
+# DT 열을 숫자로 변환
+df_cpi["수치값"] = pd.to_numeric(df_cpi["수치값"], errors="coerce")
+
+# 수록시점(PRD_DE)을 기준으로 정렬 (오름차순)
+df_cpi.sort_values(by="수록시점", ascending=True, inplace=True)
+
+# 물가상승률(증감률) 계산: (현재 CPI - 이전 CPI) / 이전 CPI * 100
+df_cpi["물가상승률"] = df_cpi["수치값"].pct_change() * 100
+
+df_cpi[["수록시점", "수치값", "물가상승률"]]
+```
+
+- 이제 이렇게 확보한 두 데이터르 연도를 기준으로 합쳐 하나의 데이터로 만들어 보자. ChatGPT에게 두 데이터프레임을 하나로 머지(merge)하는 코드를 요청할 수 있다.
+    - 간단하게 머지(merge)의 기준이 되는 키 값 등 정보를 제공 후 두 데이터프레임을 하나로 합치는 코드를 달라고 하면 된다.
+- 두 데이터를 합친 후 우리가 관심있어 하는 변수가 잘 붙었는지 꼭 확인하는 습관을 들이자.
+
+```{python}
+# 데이터프레임 병합
+df_merged = pd.merge(df_cpi, df_unemp, on="수록시점", how="inner", suffixes=("_cpi", "_unemp"))
+
+df_merged[["수록시점", "물가상승률", "수치값_unemp"]].head()
+```
+
+- 이제 이 그래프를 이용해 스캐터그램을 그려보자. ChatGPT에게 다음과 같이 요청하였다.
+    - 실업률을 x축으로, 소비자물가지수를 y 축으로 scatter를 그리는 코드를 제시해줘
+
+```{python}
+import matplotlib.pyplot as plt
+
+# 산점도 그리기
+plt.figure(figsize=(8, 6))
+plt.scatter(df_merged["수치값_unemp"], df_merged["물가상승률"], alpha=0.7)
+plt.xlabel("실업률 (%)")
+plt.ylabel("물가상승률")
+plt.title("실업률과 물가상승률의 관계")
+plt.grid(True)
+plt.show()
+```
+
+- 우리가 익히 알고 있는 필립스 커브의 내용인 물가상승률과 실업률이 반비례한다는 내용과 비슷해 보이나 뚜렷하지는 않았다. 필립스 곡선은 단기적으로 물가상승률과 실업률 간의 관계를 나타내므로 아래 코드와 같이 기간을 단축시키면 좀 더 뚜렷해 진다.
+
+```{python}
+import matplotlib.pyplot as plt
+
+# 2019년 이전 데이터 필터링
+df_filtered = df_merged[df_merged["수록시점"].astype(int) < 202112]
+
+# 산점도 그리기
+plt.figure(figsize=(8, 6))
+plt.scatter(df_filtered["수치값_unemp"], df_filtered["물가상승률"], alpha=0.7)
+plt.xlabel("실업률 (%)")
+plt.ylabel("물가상승률")
+plt.title("실업률과 물가상승률의 관계 (2019년 이전)")
+plt.grid(True)
+plt.show()
+
+```
+
+# 연습문제
