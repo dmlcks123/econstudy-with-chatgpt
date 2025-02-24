@@ -3,16 +3,15 @@ title: "Ch6. 텍스트마이닝 활용하여 경제 데이터분석"
 Author: "Euichan hwang"
 date: "2025-02-05"
 version: v3
-format:
-  docx:
+format: docx
     toc: false
     number-sections: true
     highlight-style: pygments
-    reference-doc: index.docx
+    reference-doc: index.docx    
   html:
     toc: false
     number-sections: true
-    highlight-style: pygments   
+    highlight-style: pygments
 ---
 
 # 학습목표{.unnumbered}
@@ -509,35 +508,46 @@ plt.show()
 ## 뉴스기사 크롤링
 ```{python}
 ## 1. 뉴스기사 크롤링
+from selenium import webdriver
+from bs4 import BeautifulSoup
+import time
+from datetime import datetime
+import csv
 
-# 크롬 드라이버 설정
+# 크롬 드라이버 설정 (ChromeDriver가 시스템 PATH에 있거나, 실행 파일 경로를 지정)
 options = webdriver.ChromeOptions()
-options.add_argument('--headless')  # 크롬창이 뜨지 않게 설정
+options.add_argument('--headless')  # 브라우저 창이 뜨지 않게 설정
 options.add_argument('--no-sandbox')
 options.add_argument('--disable-dev-shm-usage')
 driver = webdriver.Chrome(options=options)
 
-# 연합 뉴스 경제 페이지로 이동
-url = 'https://www.yna.co.kr/economy/all'
-driver.get(url)
+try:
+    # 연합 뉴스 경제 페이지로 이동
+    url = 'https://www.yna.co.kr/economy/all'
+    driver.get(url)
+    print("페이지에 접속하였습니다.")
 
-# 페이지 배율 줄이기 (줌 아웃)
-driver.execute_script("document.body.style.zoom='50%'")
-time.sleep(2)
-
-# 페이지 스크롤 끝까지 내리기
-last_height = driver.execute_script("return document.body.scrollHeight")
-while True:
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    # 페이지 배율 줄이기 (줌 아웃)
+    driver.execute_script("document.body.style.zoom='50%'")
     time.sleep(2)
-    new_height = driver.execute_script("return document.body.scrollHeight")
-    if new_height == last_height:
-        break
-    last_height = new_height
 
-# 페이지 소스 가져오기
-page_source = driver.page_source
-driver.quit()
+    # 페이지 스크롤 끝까지 내리기
+    last_height = driver.execute_script("return document.body.scrollHeight")
+    while True:
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(2)
+        new_height = driver.execute_script("return document.body.scrollHeight")
+        if new_height == last_height:
+            break
+        last_height = new_height
+    print("페이지 스크롤 완료.")
+
+    # 페이지 소스 가져오기
+    page_source = driver.page_source
+
+finally:
+    driver.quit()
+    print("드라이버 종료.")
 
 # BeautifulSoup을 사용하여 페이지 파싱
 soup = BeautifulSoup(page_source, 'html.parser')
@@ -545,11 +555,14 @@ news_data = []
 
 # 뉴스 기사 요소 찾기
 news_elements = soup.select('div.list-type038 ul.list li')
+print(f"찾은 뉴스 기사 수: {len(news_elements)}")
 
 for element in news_elements:
     try:
         # 제목과 링크 수집
         link_element = element.select_one('a.tit-wrap')
+        if link_element is None:
+            continue
         title = link_element.text.strip()
         link = link_element['href']
 
@@ -563,25 +576,21 @@ for element in news_elements:
             'time': time_text
         })
     except Exception as e:
+        print("기사 처리 중 에러 발생:", e)
         continue
 
 # 수집한 데이터를 CSV 파일로 저장
 current_time = datetime.now().strftime('%Y%m%d_%H%M%S')
 file_name = f'{current_time}.csv'
 
-with open(file_name, mode='w', newline='', encoding='utf-8-sig') as file:
-    writer = csv.DictWriter(file, fieldnames=['title', 'link', 'time'])
-    writer.writeheader()
-    writer.writerows(news_data)
-
-print(f'Data saved to {file_name}')
 ```
 
 ## 수집 된 기사 토큰화
 ```{python}
 # 텍스트 전처리 및 토크나이즈 함수 정의
+from konlpy.tag import Okt
 okt = Okt()
-spacing = Spacing()
+#spacing = Spacing()
 
 def preprocess_text(text):
     # 특수문자 제거
@@ -661,7 +670,7 @@ import torch.nn.functional as F
 
 
 # CSV 파일 불러오기
-file_path = '/content/20240718_022815.csv'
+file_path = '/content/파일명.csv'
 df = pd.read_csv(file_path)
 
 # 요약 모델 로드 (PyTorch 사용)
