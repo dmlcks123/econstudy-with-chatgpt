@@ -1,0 +1,560 @@
+---
+title: "Ch10. 머신러닝 기초"
+date: "2024-08-15"
+version: "1.0"
+author: "Taewoo Kim"
+format:
+  docx:
+    toc: false
+    number-sections: true
+    highlight-style: pygments
+    reference-doc: index.docx
+  html:
+    toc: false
+    number-sections: true
+    highlight-style: pygments
+---
+
+# 학습목표 {.unnumbered}
+- 머신러닝에 대한 기초 이해(회귀분석과 분류기법을 중심으로)
+- ChatGPT를 활용한 머신러닝(회귀분석과 분류기법) 파이썬 실습
+- 'Keggle'에 대한 소개
+<br>
+
+# 세부 학습 내용  {.unnumbered}
+ 1. 머신러닝에 대한 기본적인 이해
+ 2. 회귀분석에 대한 이해와 종류
+ 3. 분류기법에 대한 이해와 종류
+ 4. 'Keggle'에 대한 소개
+<br>
+
+# 머신러닝에 대한 기초 이해
+<br>
+
+- 머신러닝(Machine Learning)에 대해 이해하기 위해 ChatGPT에게 질문해 보았다.
+<br>
+
+::: {.callout-note title="ChatGPT에 질문하기"}
+대학원과정에서 공부할수준으로 '머신러닝'에 대해서 정의하고 주요 요소에 대해 자세하게 설명해줘
+:::
+<br>
+
+## 머신러닝의 목표
+- ChatGPT는 머신러닝에 대해 '컴퓨터가 명시적으로 프로그래밍 않고도 데이터를 통해 학습하고 예측하거나 결정을 내릴 수 있게 하는 인공지능의 한 분야로 주로 통계적 기법과 알고리즘을 사용하여 데이터를 분석하고 패턴을 인식하는 것을 의미하며, 그 인식을 기반으로 미래의 데이터를 예측하는 데 중점을 둡니다.' 라고 답하였다.
+- ChatGPT가 언급한 것처럼 '머신러닝'의 핵심목표는 '가진 정보를 기반으로 하여 정확한 예측값을 얻는 것'이라고 할 수 있다.
+<br>
+
+
+## 머신러닝의 주요 요소
+- 데이터: 머신러닝 모델은 대량의 데이터를 통해 학습하며, 데이터는 보통 학습 데이터(Training data)와 테스트 데이터(Test data)로 나누어 진다.
+- 알고리즘: 데이터를 분석하고 패턴을 학습하기 위해 다양한 알고리즘이 사용되며, 이러한 알고리즘은 지도학습(Supervised learning), 비지도학습(unsupervised learning), 강화학습(reinforcement learning) 등의 방법론에 따라 분류된다.
+- 모델: 알고리즘을 통해 학습된 결과물로, 모델은 입력 데이터를 받아 예측 결과를 출력한다.
+- 학습: 모델이 데이터를 통해 패턴을 인식하는 과정으로, 이 과정에서 모델은 데이터의 특성을 학습하고 이를 통해 새로운 데이터를 예측하는 능력을 갖추게 된다.
+- 평가: 학습된 모델의 성능을 평가하기 위해 테스트 데이터나 교차 검증(Cross-vaildation) 등의 방법이 사용되며, 이를 통해 모델의 일반화 능력을 확인하고 필요에 따라 모델을 개선한다.
+<br>
+
+## 머신러닝의 종류
+<br>
+
+::: {.callout-note title="ChatGPT에 질문하기"}
+머신러닝에서 회귀분석과 분류기법에 대해 설명하고, 둘 간의 차이점을 자세하게 알려줘
+:::
+<br>
+
+- ChatGPT는 '머신러닝에 회귀분석과 분류기법 두 가지 주요 예측 모델링 접근법이 있으며, 각각 연속적인 값 예측과 범주형 데이터 분류에 사용됩니다. 이 두 기법은 데이터 분석에서 매우 중요한 역할을 하며, 서로 다른 문제 유형을 해결하는데 적합합니다.' 라고 답하였다.
+- 회귀분석(Regression Analysis)은 종속변수와 하나 이상의 독립변수 간의 관계를 모델링하여 연속적인 값을 예측하는 방법으로, 회귀분석의 목적은 독립변수를 사용하여 종속변수의 값을 정확하게 예측하거나, 독립변수와 종속변수 간의 관계를 이해하는 것이다.
+- 회귀분석에는 단순선형회귀(Simple Linear Regression), 다중선형회귀(Multiple Linear Regression), 릿지회귀(Ridge Regression), 라쏘회귀(Lasso Regression), 다항회귀(Polynomial Regression) 등이 있다.
+- 회귀분석의 모델평가는 주로 평균제곱오차(MSE),결정계수(R²) 등으로 모델의 성능을 평가한다.
+- 분류기법(Classification Techniques)은 데이터 포인트를 미리 정의된 범주 또는 클래스로 할당하는 기법으로 종속변수는 이산적(범주형) 값으로 여러 범주 중 하나로 예측되며, 분류기법의 목적은 새롭게 주어진 데이터 포인트가 어떤 클래스에 속하는지를 정확히 예측하는 것이다.
+- 분류기법에는 로지스틱회귀(Logistic Regression), K-최근접이웃(K-Nearest Neighbors, KNN), 서포트벡터머신(Support Vector Machine, SVM), 결정트리(Decision Tree), 랜덤포레스트(Random Forest), 나이브베이즈(Naive Bayes) 등이 있다.
+- 분류기법의 모델평가는 주로 정확도(Accuracy), 정밀도(Precision), 재현율(Recall), F1스코어, ROC-AUC 등으로 모델의 성능을 평가한다.
+<br>
+
+| 특징              | 회귀 분석                                           | 분류 기법                                                     |
+|-------------------|----------------------------------------------------|--------------------------------------------------------------|
+| 예측 결과         | 연속적인 값 (실수)                                   | 이산적인 값 (범주)                                            |
+| 주요 목적         | 값을 예측하고 독립 변수와 종속 변수 간의 관계 분석      | 데이터를 특정 클래스(범주)로 분류                              |
+| 평가 방법         | MSE, RMSE, MAE, R²                                  | 정확도, 정밀도, 재현율, F1 스코어, ROC-AUC 등                  |
+| 모델 예시         | 선형회귀, 릿지회귀, 라쏘회귀, 다항회귀 등              | 로지스틱회귀, SVM, KNN, 결정트리, 랜덤포레스트 등               |
+| 응용 분야         | 주택 가격 예측, 매출 예측, 온도 예측 등                | 스팸 필터링, 질병 진단, 이미지 분류 등                         |
+| 복잡성            | 선형 모델이 일반적이나, 비선형 회귀도 존재              | 선형 모델과 비선형 모델 모두 존재                             |
+| 기본 가정         | 독립 변수와 종속 변수 간의 관계가 선형적일 가능성이 있음 | 독립 변수와 종속 변수 간의 관계가 이산적이며, 명확한 경계가 존재 |
+<br>
+
+## 회귀분석 - 소개
+### 단순선형회귀(Simple Linear Regression)
+- 단순선형회귀는 하나의 독립변수와 하나의 종속변수 간의 선형관계를 모델링하는 회귀분석 방법이다.
+
+<br>
+   y = β₀ + β₁x + ε
+<br>
+
+- 여기서 y는 종속변수, β₀는 절편, β₁는 기울기(회귀계수), ε은 오차를 나타낸다.
+- 가장 기본적인 회귀분석 방법으로 해석이 쉽고 구현이 간단하며, 독립변수와 종속변수 간의 선형관계를 가정한다.
+- 장점: 결과를 직관적으로 이해하고 설명하기 쉬우며, 계산이 간단하고 빠르다.
+- 단점: 독립변수와 종속변수 간의 선형관계를 가정하므로, 실제 데이터가 비선형적일 경우 부적합할 수 있으며, 단일 독립변수만 고려하므로 다른 중요한 변수를 무시할 수 있다.
+<br>
+
+### 다중선형회귀(Multiple Linear Regression)
+- 다중선형회귀는 여러 독립변수와 하나의 종속변수 간의 선형관계를 모델링하는 회귀분석 방법이다.
+
+<br>
+   y = β₀ + β₁x₁ + β₂x₂ + ... + βₙxₙ + ε
+<br>
+
+- 여기서 y는 종속변수, x₁,x₂,...,xₙ는 독립변수들, β₀는 절편, β₁,β₂,...,βₙ는 각 독립변수에 대한 회귀계수, ε은 오차를 나타낸다.
+- 여러 독립변수를 고려하여 종속변수에 미치는 영향을 분석하며, 단순선형회귀와 마찬가지로 독립변수와 종속변수 간의 선형관계를 가정한다.
+- 장점: 여러 변수를 동시에 고려할 수 있어 더 포괄적인 분석이 가능하며, 각 독립변수가 종속변수에 미치는 영향을 개별적으로 평가할 수 있다.
+- 단점: 독립변수들 간에 강한 상관관계가 있으면 모델 성능이 저하될 수 있으며, 많은 변수를 다루면 모델 해석이 어려워질 수 있다.
+<br>
+
+### 릿지회귀(Ridge Regression)
+- 릿지회귀는 다중선형회귀의 확장으로, 과적합(overfitting)을 방지하기 위해 모델의 복잡도에 패널티를 부과하는 회귀분석 방법이다.
+
+<br>
+   minimize ( Σ(yᵢ - ŷᵢ)² + λΣ(βⱼ)² )
+<br>
+
+- 함수에 L2 노름을 추가하여 회귀계수의 크기를 최소화하며, λ는 규제 파라미터로 모델의 복잡도와 편향(bias)을 조절한다.
+- L2 규제를 통해 회귀계수의 크기를 제한하여 과적합을 방지하지만, 대부분의 변수가 모델에 남아 있다. 
+- 장점: 규제를 통해 과적합을 줄이며 일반화 성능을 향상시키고, 독립변수 간의 다중공선성 문제를 완화한다.
+- 단점: 규제 파라미터를 사용하는 모델은 해석이 어려우며, 계수의 크기는 줄지만 불필요한 변수를 완전히 제거하지는 못한다.
+<br>
+
+### 라쏘회귀(Lasso Regression)
+- 라쏘회귀는 릿지회귀와 유사하지만, L1 노름을 사용하여 회귀계수에 패널티를 부과하는 회귀분석 방법이다.
+
+<br>
+   minimize ( Σ(yᵢ - ŷᵢ)² + λΣ|βⱼ| )
+<br>
+
+- 함수에 L1 노름을 추가하여 일부 회귀계수를 0으로 만들어 변수 선택 기능을 제공한다.
+- L1 규제를 통해 불필요한 변수를 완전히 제거하고, 변수 선택을 수행한다.
+- 장점: 자동으로 변수 선택을 수행하여 모델을 간결하게 만들며, 과적합을 줄이고 일반화 성능을 향상시킨다.
+- 단점: 규제 파라미터를 사용하는 모델은 해석이 어려우며, 데이터 포인트가 충분하지 않을 경우 모델 성능이 저하될 수 있다.
+<br>
+
+### 다항회귀(Polynomial Regression)
+- 다항회귀는 선형회귀의 확장으로 독립변수의 다항식 형태를 사용하여 종속변수와의 관계를 모델링한다.
+<br>
+   y = β₀ + β₁x + β₂x² + ... + βₙxⁿ + ε
+<br>
+
+- 여기서 x²,...,xⁿ는 독립변수의 다항식 항이다.
+- 비선형 관게를 모델링할 수 있으며, 독립변수의 다항식 항을 사용하여 복잡한 관계를 설명한다.
+- 장점: 독립변수와 종속변수 간의 비선형 관계를 모델링할 수 있으며, 모델이 매우 유연하여 다양한 데이터 패턴을 캡처할 수 있다.
+- 단점: 높은 차수의 다항식을 사용할 경우 모델이 과적합될 수 있으며, 모델이 복잡해질수록 해석이 어려워질 수 있다.
+<br>
+
+## 회귀분석 - 실습
+
+### 실습용 데이터 생성
+- 회귀분석을 실습하기 위한 기본적인 데이터 생성을 ChatGPT에게 부탁하였다.
+<br>
+
+::: {.callout-note title="ChatGPT에 질문하기"}
+단순선형회귀, 다중선형회귀, 릿지회귀, 라쏘회귀, 다항회귀를 연습할 수 있는 데이터를 생성하고 기본적인 분석의 예시 코드를 만들어줘. 다만 연습할 수 있는 데이터는 난수가 아니라 고정된 100개의 관측치를 가지는 데이터로 만들어줘(각 모델의 결과 차이가 나타날 수 있도록 데이터를 넓게 분포시켜줘)
+:::
+<br>
+
+::: {.callout-note title="code"}
+import numpy as np
+
+import pandas as pd
+
+import matplotlib.pyplot as plt
+
+from sklearn.linear_model import LinearRegression, Ridge, Lasso
+
+from sklearn.preprocessing import PolynomialFeatures
+
+- 고정된 랜덤 시드 설정
+
+np.random.seed(42)
+
+- 데이터 생성
+X1 = np.linspace(0, 100, 100)  # X1의 범위를 크게 설정
+
+X2 = np.sin(X1) + 0.5 * X1 + np.random.normal(0, 10, 100)  # 큰 노이즈 추가
+
+- 종속 변수 생성 (y = 2*X1 + 0.1*X2^2 - 10*X2 + 100 + 큰 노이즈 추가)
+y = 2 * X1 + 0.1 * (X2 ** 2) - 10 * X2 + 100 + np.random.normal(0, 50, 100)
+
+- 데이터프레임으로 정리
+df = pd.DataFrame({'X1': X1, 'X2': X2, 'y': y})
+::: 
+<br>
+
+- 위 과정을 통해 관측치가 100개인 X1, X2, y 3개의 변수를 얻을 수 있다.
+- 간략하게 분포를 확인하기 위해 히스토그램을 그려보면 다음과 같다.
+<br>
+
+::: {.callout-note title="code"}
+- 히스토그램 예시
+df.hist(bins=30, figsize=(15, 10))
+
+plt.tight_layout()
+
+plt.show()
+::: 
+<br>
+
+### 회귀분석 실습
+- 생성한 회귀분석용 데이터를 통한 각 회귀분석 모델을 파이썬으로 분석할 수 있도록 ChatGPT에게 부탁하였다.
+<br>
+
+::: {.callout-note title="ChatGPT에 질문하기"}
+위에서 생성한 데이터를 통해 단순선형회귀, 다중선형회귀, 릿지회귀, 라쏘회귀, 다항회귀를 각각 개별로 테스트한 결과를 그래프로 보여주고, 결과를 모아서 비교해줘
+:::
+<br>
+
+::: {.callout-note title="code"}
+- 단순선형회귀 모델 (X1만 사용)
+
+model_simple = LinearRegression()
+
+model_simple.fit(df[['X1']], df['y'])
+
+y_pred_simple = model_simple.predict(df[['X1']])
+
+plt.figure(figsize=(6, 4))
+
+plt.scatter(df['X1'], df['y'], color='blue', label='Actual Data')
+
+plt.plot(df['X1'], y_pred_simple, color='red', label='Simple Linear Regression')
+
+plt.title('Simple Linear Regression')
+
+plt.xlabel('X1')
+
+plt.ylabel('y')
+
+plt.legend()
+
+plt.show()
+::: 
+<br>
+
+- 위 코드에서 'model_simple = LinearRegression()'은 모델(model_simple)이 단순선형회귀 모델임을 선언,
+- 'model_simple.fit(df[['X1']], df['y'])'을 통해 선언된 모델에서 X1을 설명변수, y는 종속변수로 학습하도록 지정,
+- 'y_pred_simple = model_simple.predict(df[['X1']])'은 학습을 통해서 X1 설명변수를 통한 y값을 예측을 수행하라는 의미이다.
+<br>
+
+
+::: {.callout-note title="code"}
+- 다중선형회귀 모델
+
+model_multiple = LinearRegression()
+
+model_multiple.fit(df[['X1', 'X2']], df['y'])
+
+y_pred_multiple = model_multiple.predict(df[['X1', 'X2']])
+
+plt.figure(figsize=(6, 4))
+
+plt.scatter(df['X1'], df['y'], color='blue', label='Actual Data')
+
+plt.plot(df['X1'], y_pred_multiple, color='red', label='Multiple Linear Regression')
+
+plt.title('Multiple Linear Regression')
+
+plt.xlabel('X1')
+
+plt.ylabel('y')
+
+plt.legend()
+
+plt.show()
+::: 
+<br>
+
+- 기본적으로 코드의 형태와 내용은 앞선 단순선형회귀 모델과 동일하다.
+- 다만, 'model_multiple.fit(df[['X1', 'X2']], df['y'])'을 통해 X1과 X2 두 변수 모두가 설명변수라고 지정하는 차이만 있다.
+<br>
+
+::: {.callout-note title="code"}
+- 릿지회귀 모델
+
+model_ridge = Ridge(alpha=8.0)
+
+model_ridge.fit(df[['X1', 'X2']], df['y'])
+
+y_pred_ridge = model_ridge.predict(df[['X1', 'X2']])
+
+plt.figure(figsize=(6, 4))
+
+plt.scatter(df['X1'], df['y'], color='blue', label='Actual Data')
+
+plt.plot(df['X1'], y_pred_ridge, color='red', label='Ridge Regression')
+
+plt.title('Ridge Regression')
+
+plt.xlabel('X1')
+
+plt.ylabel('y')
+
+plt.legend()
+
+plt.show()
+::: 
+<br>
+
+- 기본적으로 코드의 형태와 내용은 앞선 다중선형회귀 모델과 동일하다.
+- 다만, 'model_ridge = Ridge(alpha=8)'을 통해 이 'model_rigde'는 릿지회귀 모델임을 선언하는 차이가 있다.
+- 앞선 코드에서 지정하는 알파값('alpha=1.0')은 규제의 강도를 의미하여, 0을 넣게되면 다중선형회귀 모델과 동일해지며, 반대로 큰 값을 넣으면 회귀 계수 값이 작아지는 효과를 지닌다.
+- 알파값이 작으면(예: 0.1, 0.01) 모델이 데이터를 잘 적합하지만 규제가 거의 없기 때문에 과적합의 위험이 발생하며, 알파값이 커지면(예: 10, 100) 모델이 단순화되어 과적합의 위험은 줄지만 모델이 중요한 패턴을 포착하지 못하고 과소적합될 수 있다.
+<br>
+
+::: {.callout-note title="code"}
+- 라쏘회귀 모델
+
+model_lasso = Lasso(alpha=8)
+
+model_lasso.fit(df[['X1', 'X2']], df['y'])
+
+y_pred_lasso = model_lasso.predict(df[['X1', 'X2']])
+
+plt.figure(figsize=(6, 4))
+
+plt.scatter(df['X1'], df['y'], color='blue', label='Actual Data')
+
+plt.plot(df['X1'], y_pred_lasso, color='red', label='Lasso Regression')
+
+plt.title('Lasso Regression')
+
+plt.xlabel('X1')
+
+plt.ylabel('y')
+
+plt.legend()
+
+plt.show()
+::: 
+<br>
+
+- 기본적으로 코드의 형태와 내용은 앞선 릿지회귀 모델과 동일하다.
+- 'model_lasso = Lasso(alpha=8)'을 통해 알파값이 규제의 강도를 의미하는 것도 동일하나, 릿지회귀 모델과 달리 알파값 따라 회귀 계수를 0으로 만드는 것도 가능하다.
+- 알파값이 작으면(예: 0.1, 0.01) 릿지회귀 모델과 같이 데이터를 잘 적합하지만 규제가 거의 없기 때문에 과적합의 위험이 발생하며, 알파값이 커지면(예: 10, 100) 모델이 단순화되어 과적합의 위험은 줄지만 회귀계수 값이 더 쉽게 0이되어 중요한 변수를 놓칠 위험이 커진다.
+<br>
+
+::: {.callout-note title="code"}
+- 다항회귀 모델 (2차 다항식)
+
+poly_features = PolynomialFeatures(degree=2)
+
+X_poly_transformed = poly_features.fit_transform(df[['X1', 'X2']])
+
+model_poly = LinearRegression()
+
+model_poly.fit(X_poly_transformed, df['y'])
+
+y_pred_poly = model_poly.predict(X_poly_transformed)
+
+plt.figure(figsize=(6, 4))
+
+plt.scatter(df['X1'], df['y'], color='blue', label='Actual Data')
+
+plt.plot(df['X1'], y_pred_poly, color='red', label='Polynomial Regression')
+
+plt.title('Polynomial Regression')
+
+plt.xlabel('X1')
+
+plt.ylabel('y')
+
+plt.legend()
+
+plt.show()
+::: 
+<br>
+
+- 코드는 다중선형회귀 모델과 유사하다.
+- 'poly_features = PolynomialFeatures(degree=2)'에서 'degree=2'는 2차 다항식을 의미하며, 2차항을 포함한 다항식 변환을 수행하게 된다. 3차 다항식은 'degree=3', 4차 다항식은 'degree=4'와 같은 형식으로 조정하면 된다.
+- 'X_poly_transformed = poly_features.fit_transform(df[['X1', 'X2']])'는 x1과 x2변수를 다항식 형태로 변환하여 새로운 특성 행렬 'X_poly_transformed'을 생성하는 과정이다.
+- 'model_poly = LinearRegression()'는 기존에 단순선형회귀 모델이나 다중선형회귀 모델처럼 다항회귀도 본질적으로 선형회귀와 동일한 방식으로 학습하도록 하며, 입력 데이터가 다항식으로 변환된 특성 집합을 사용하는 것이다.
+- 'model_poly.fit(X_poly_transformed, df['y'])'은 기존의 'model_simple.fit(df[['X1']], df['y'])'와 동일한 코드 형식을 가지며, 'y_pred_poly = model_poly.predict(X_poly_transformed)'도 기존 'y_pred_simple = model_simple.predict(df[['X1']])'코드와 동일한 코드 형식임을 알 수 있다. 다만, 'X1'변수 하나가 아닌 기존에 변경한 특성 행렬을 사용하기에 'df['']'가 붙지 않는 차이가 있다.
+<br>
+
+::: {.callout-note title="code"}
+- 결과출력 (모델별 회귀 계수)
+
+print("Simple Linear Regression Coefficients:", model_simple.coef_)
+
+print("Multiple Linear Regression Coefficients:", model_multiple.coef_)
+
+print("Ridge Regression Coefficients:", model_ridge.coef_)
+
+print("Lasso Regression Coefficients:", model_lasso.coef_)
+
+print("Polynomial Regression Coefficients:", model_poly.coef_)
+::: 
+<br>
+
+- 결과(계수)를 정리하면 다음의 표과 같다.
+<br>
+
+| 모델              | X1 계수      | X2 계수       | 그 외(x₁², x₁*x₂, x₂²)    |
+|-------------------|-------------|---------------|---------------------------|
+| 단순선형회귀        | -0.6295     | 해당없음      | 해당없음                  |
+| 다중선형회귀        | 2.5510      | -6.2041      | 해당없음                  |
+| 릿지회귀         | 2.5470        | -6.1968       | 해당없음                  |
+| 라쏘회귀         | 2.4657        | -6.0562       | 해당없음                  |
+| 다항회귀         | 2.5031        | -9.9324       | 0.0199, -0.0893, 0.1787  |
+<br>
+
+- 결과를 시각화하여 비교하면 다음과 같다.
+<br>
+
+::: {.callout-note title="code"}
+- 결과 비교 시각화
+
+plt.figure(figsize=(8, 6))
+
+- 단순선형회귀
+
+plt.plot(df['X1'], y_pred_simple, label='Simple Linear Regression', color='red', linewidth=2)
+
+- 다중선형회귀 (선 굵기 증가)
+
+plt.plot(df['X1'], y_pred_multiple, label='Multiple Linear Regression', color='blue', linewidth=4, linestyle='--')
+
+- 릿지회귀 (선 굵기 증가 및 색상 대비 증가)
+
+plt.plot(df['X1'], y_pred_ridge, label='Ridge Regression', color='green', linewidth=4, linestyle=':')
+
+- 라쏘회귀
+
+plt.plot(df['X1'], y_pred_lasso, label='Lasso Regression', color='orange', linewidth=2)
+
+- 다항회귀
+
+plt.plot(df['X1'], y_pred_poly, label='Polynomial Regression', color='purple', linewidth=2)
+
+- 실제 데이터
+plt.scatter(df['X1'], df['y'], color='black', label='Actual Data', alpha=0.6)
+
+plt.title('Comparison of Different Regression Models')
+
+plt.xlabel('X1')
+
+plt.ylabel('y')
+
+plt.legend()
+
+plt.show()
+::: 
+<br>
+
+- 해당 모델들의 예측력을 평가하기 위해 4가지의 평가지표(R², MAE, MSE, RMSE)를 사용하여 분석하고자 한다.
+- R²(결정계수, R-squared): 모델이 전체 변동성 중 얼마나 많은 부분을 설명하는지 나타내며, 1에 가까울수록 모델의 설명력이 높다.
+- MAE (Mean Absolute Error): 예측값과 실제값 간의 차이의 절대값 평균으로, 값이 작을수록 모델의 예측력이 높다.
+- MSE (Mean Squared Error): 예측값과 실제값 간의 차이의 제곱 평균으로, 값이 작을수록 모델의 예측력이 높다.
+- RMSE (Root Mean Squared Error): MSE의 제곱근으로, 예측값과 실제값 간의 차이의 평균적인 크기를 나타낸다.
+<br>
+
+::: {.callout-note title="code"}
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+
+- 모델별 예측 값
+
+y_pred_simple = model_simple.predict(df[['X1']])
+
+y_pred_multiple = model_multiple.predict(df[['X1', 'X2']])
+
+y_pred_ridge = model_ridge.predict(df[['X1', 'X2']])
+
+y_pred_lasso = model_lasso.predict(df[['X1', 'X2']])
+
+y_pred_poly = model_poly.predict(X_poly_transformed)
+
+- R² 계산
+
+r2_simple = r2_score(df['y'], y_pred_simple)
+
+r2_multiple = r2_score(df['y'], y_pred_multiple)
+
+r2_ridge = r2_score(df['y'], y_pred_ridge)
+
+r2_lasso = r2_score(df['y'], y_pred_lasso)
+
+r2_poly = r2_score(df['y'], y_pred_poly)
+
+- MAE 계산
+
+mae_simple = mean_absolute_error(df['y'], y_pred_simple)
+
+mae_multiple = mean_absolute_error(df['y'], y_pred_multiple)
+
+mae_ridge = mean_absolute_error(df['y'], y_pred_ridge)
+
+mae_lasso = mean_absolute_error(df['y'], y_pred_lasso)
+
+mae_poly = mean_absolute_error(df['y'], y_pred_poly)
+
+- MSE 계산
+
+mse_simple = mean_squared_error(df['y'], y_pred_simple)
+
+mse_multiple = mean_squared_error(df['y'], y_pred_multiple)
+
+mse_ridge = mean_squared_error(df['y'], y_pred_ridge)
+
+mse_lasso = mean_squared_error(df['y'], y_pred_lasso)
+
+mse_poly = mean_squared_error(df['y'], y_pred_poly)
+
+- RMSE 계산
+
+rmse_simple = np.sqrt(mse_simple)
+
+rmse_multiple = np.sqrt(mse_multiple)
+
+rmse_ridge = np.sqrt(mse_ridge)
+
+rmse_lasso = np.sqrt(mse_lasso)
+
+rmse_poly = np.sqrt(mse_poly)
+
+- 결과 출력
+
+print(f"Simple Linear Regression: R²={r2_simple:.3f}, MAE={mae_simple:.3f}, MSE={mse_simple:.3f}, RMSE={rmse_simple:.3f}")
+
+print(f"Multiple Linear Regression: R²={r2_multiple:.3f}, MAE={mae_multiple:.3f}, MSE={mse_multiple:.3f}, RMSE={rmse_multiple:.3f}")
+
+print(f"Ridge Regression: R²={r2_ridge:.3f}, MAE={mae_ridge:.3f}, MSE={mse_ridge:.3f}, RMSE={rmse_ridge:.3f}")
+
+print(f"Lasso Regression: R²={r2_lasso:.3f}, MAE={mae_lasso:.3f}, MSE={mse_lasso:.3f}, RMSE={rmse_lasso:.3f}")
+
+print(f"Polynomial Regression: R²={r2_poly:.3f}, MAE={mae_poly:.3f}, MSE={mse_poly:.3f}, RMSE={rmse_poly:.3f}")
+::: 
+<br>
+
+- 예측력 평가 결과를 정리하면 다음의 표과 같다.
+<br>
+
+| 모델              | R²       | MAE        | MSE         | RMSE    | 
+|-------------------|---------|------------|-------------|----------|
+| 단순선형회귀        | 0.052  | 61.374     | 6,090.229   | 78.040   |
+| 다중선형회귀        | 0.544  | 42.120     | 2,929.150   | 54.122   |
+| 릿지회귀         | 0.544     | 42.113     | 2,929.154   | 54.122   |
+| 라쏘회귀         | 0.544     | 41.997     | 2,931.022   | 54.139   |
+| 다항회귀         | 0.674     | 37.582     | 2,094.748   | 45.768   |
+<br>
+
+- R² 기준 다항회귀 모델이 가장 우수하며 데이터를 가장 잘 설명하고, 단순선형회귀 모델이 가장 낮은 값을 보여줘 설명력이 매우 떨어진다.
+- MAE 기준 역시 다항회귀 모델이 가장 우수하며 예측 오차가 가장 작고, 라쏘회귀 모델, 릿지회귀 모델, 다중선형회귀 모델, 단순선형회귀 모델 순으로 나타났다. 
+- MSE 기준에 따라서도 다항회귀 모델이 가장 우수하며, 라쏘회귀 모델, 릿지회귀 모델, 다중선형회귀 모델은 유사한 성능을 보였다.
+- RMSE 기준에서도 다항회귀 모델이 가장 우수하며 가장 낮은 예측 오차를 보였다.
+- 다만, 이러한 결과는 현재 제공된 데이터를 기준으로 예측력을 평가한 결과로, 일반적인 모든 경우에서 적용되는 성능은 아님을 명심해야 한다.
+<br>
+
+
+
+
+
+
+
+
+
+
+
